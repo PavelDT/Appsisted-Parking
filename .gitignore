@@ -15,5 +15,6 @@ app/appsistedparking/gradle.properties
 app/appsistedparking/gradle/
 app/appsistedparking/.gradle
 app/appsistedparkingout/
-
 app/appsistedparking/gradle/wrapper/
+app/appsistedparking/app/.gitignore
+app/appsistedparking/app/build/
