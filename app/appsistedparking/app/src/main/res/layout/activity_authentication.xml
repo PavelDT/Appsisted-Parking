@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.LoginActivity">
+
+    <ImageView
+        android:id="@+id/imageViewLogo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:background="#000000"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        android:src="@drawable/logo" />
+
+    <EditText
+        android:id="@+id/editTextUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/imageViewLogo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:width="250dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:padding="10dp"
+        android:hint="USERNAME"
+        android:drawablePadding="3sp"
+        android:drawableLeft="@drawable/ic_person" />
+
+    <EditText
+        android:id="@+id/editTextPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/editTextUsername"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:width="250dp"
+        android:ems="10"
+        android:inputType="textPassword"
+        android:padding="10dp"
+        android:hint="PASSWORD"
+        android:drawablePadding="3sp"
+        android:drawableLeft="@drawable/ic_lock" />
+
+    <Button
+        android:id="@+id/buttonLogin"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/editTextPassword"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="30dp"
+        android:text="Login"
+        android:textColor="@android:color/white"
+        android:background="@android:color/black" />
+
+    <TextView
+        android:id="@+id/textViewRegisterLink"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/buttonLogin"
+        android:layout_centerHorizontal="true"
+        android:text="Don't have an account? Register."
+        android:textSize="20sp" />
+
+</RelativeLayout>
