@@ -9,12 +9,15 @@ import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.paveldt.appsistedparking.R;
+import com.github.paveldt.appsistedparking.model.User;
 
 public class RegistrationActivity extends AppCompatActivity {
 
@@ -25,6 +28,19 @@ public class RegistrationActivity extends AppCompatActivity {
 
         // initialise login link to navigate back to registration
         initLoginLink();
+        initRegisterButton();
+    }
+
+    private void initRegisterButton() {
+        Button registerButton = findViewById(R.id.buttonRegister);
+        registerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                User u = new User("", "");
+                String result = u.register();
+                Toast.makeText(v.getContext(), result, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     /**

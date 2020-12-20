@@ -107,6 +107,8 @@ public class User {
         // set the Cassandra consistency level to the safest possible
         // this ensures that the registration is safe and wont compete
         // with any other individual trying to register the same username
+        // serial ensures the highest level of consistency but Quarum
+        // would be a safe standard as it is the default
         bs.setConsistencyLevel(ConsistencyLevel.SERIAL);
         // register the user
         client.execute(bs);
