@@ -18,3 +18,8 @@ app/appsistedparkingout/
 app/appsistedparking/gradle/wrapper/
 app/appsistedparking/app/.gitignore
 app/appsistedparking/app/build/
+
+service/appsisted-parking/.mvn/
+service/appsisted-parking/mvnw
+service/appsisted-parking/mvnw.cmd
+service/appsisted-parking/target
