@@ -10,12 +10,19 @@ import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.github.paveldt.appsistedparking.R;
 import com.github.paveldt.appsistedparking.model.User;
 
@@ -35,10 +42,37 @@ public class RegistrationActivity extends AppCompatActivity {
         Button registerButton = findViewById(R.id.buttonRegister);
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                User u = new User("", "");
-                String result = u.register();
-                Toast.makeText(v.getContext(), result, Toast.LENGTH_LONG).show();
+            public void onClick(final View v) {
+//                User u = new User("", "");
+//                String result = u.register();
+//                Toast.makeText(v.getContext(), result, Toast.LENGTH_LONG).show();
+
+                // Instantiate the RequestQueue.
+                RequestQueue queue = Volley.newRequestQueue(v.getContext());
+                // get username
+                EditText username = findViewById(R.id.editTextUsername);
+                EditText password = findViewById(R.id.editTextPassword);
+                String url ="http://10.0.2.2:8080/user/register/?username=" +
+                        username.getText().toString().trim() +
+                        "&password=" + password.getText().toString().trim();
+
+                // Request a string response from the provided URL.
+                StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String result) {
+                                // Display the response
+                                Toast.makeText(v.getContext(), result, Toast.LENGTH_LONG).show();
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(v.getContext(), "<--ERROR--> " + error.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+
+                // Add the request to the RequestQueue.
+                queue.add(stringRequest);
             }
         });
     }
