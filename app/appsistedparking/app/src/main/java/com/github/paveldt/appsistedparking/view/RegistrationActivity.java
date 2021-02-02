@@ -24,7 +24,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.github.paveldt.appsistedparking.R;
-import com.github.paveldt.appsistedparking.model.User;
 
 public class RegistrationActivity extends AppCompatActivity {
 
@@ -43,16 +42,18 @@ public class RegistrationActivity extends AppCompatActivity {
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-//                User u = new User("", "");
-//                String result = u.register();
-//                Toast.makeText(v.getContext(), result, Toast.LENGTH_LONG).show();
-
                 // Instantiate the RequestQueue.
+                // todo -- reuse the request queue instead of re-instantiating it
+                //         every single time a user registers
                 RequestQueue queue = Volley.newRequestQueue(v.getContext());
                 // get username
                 EditText username = findViewById(R.id.editTextUsername);
                 EditText password = findViewById(R.id.editTextPassword);
-                String url ="http://10.0.2.2:8080/user/register/?username=" +
+                EditText userConfirmPassword = findViewById(R.id.editTextPasswordConfirm);
+                String pass = password.getText().toString();
+                String cpass = userConfirmPassword.getText().toString();
+
+                String url = "http://10.0.2.2:8080/user/register/?username=" +
                         username.getText().toString().trim() +
                         "&password=" + password.getText().toString().trim();
 
@@ -73,6 +74,15 @@ public class RegistrationActivity extends AppCompatActivity {
 
                 // Add the request to the RequestQueue.
                 queue.add(stringRequest);
+
+                // animate back to the login activity
+                // Intent is a mechanism for switching activities
+                // todo - add a view for the user map and navigation rather than redireting back to login
+                Intent parkingIntent = new Intent(RegistrationActivity.this, LoginActivity.class);
+                startActivity(parkingIntent);
+
+                // terminate this activity
+                finish();
             }
         });
     }
@@ -115,6 +125,4 @@ public class RegistrationActivity extends AppCompatActivity {
         // enables clicking on the link to trigger the "onClick" functionality
         loginLink.setMovementMethod(LinkMovementMethod.getInstance());
     }
-
-
 }
