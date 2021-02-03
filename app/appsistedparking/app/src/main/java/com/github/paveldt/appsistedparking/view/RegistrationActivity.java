@@ -77,8 +77,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
                 // animate back to the login activity
                 // Intent is a mechanism for switching activities
-                // todo - add a view for the user map and navigation rather than redireting back to login
-                Intent parkingIntent = new Intent(RegistrationActivity.this, LoginActivity.class);
+                Intent parkingIntent = new Intent(RegistrationActivity.this, ParkingActivity.class);
                 startActivity(parkingIntent);
 
                 // terminate this activity
