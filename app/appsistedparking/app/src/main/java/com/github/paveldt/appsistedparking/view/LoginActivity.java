@@ -12,8 +12,17 @@ import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.github.paveldt.appsistedparking.R;
 import com.github.paveldt.appsistedparking.util.Animation;
 
@@ -27,6 +36,8 @@ public class LoginActivity extends AppCompatActivity {
 
         // initialise registration link
         initRegisterLink();
+        // init login button
+        initLoginButton();
     }
 
     /**
@@ -65,5 +76,62 @@ public class LoginActivity extends AppCompatActivity {
         registrationLink.setText(spannableStr);
         // enables clicking on the link to trigger the "onClick" functionality
         registrationLink.setMovementMethod(LinkMovementMethod.getInstance());
+    }
+
+    /**
+     * Initialise login button for checking if a user exists and allowing access to the parking view.
+     */
+    private void initLoginButton() {
+        Button loginButton = findViewById(R.id.buttonLogin);
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                // Instantiate the RequestQueue.
+                // todo -- reuse the request queue instead of re-instantiating it
+                //         every single time a user registers
+                RequestQueue queue = Volley.newRequestQueue(v.getContext());
+                // get username & password from controls
+                EditText username = findViewById(R.id.editTextUsername);
+                EditText password = findViewById(R.id.editTextPassword);
+
+                // build request url that requires username and password as params
+                String url = "http://10.0.2.2:8080/user/login/?username=" +
+                        username.getText().toString().trim() +
+                        "&password=" + password.getText().toString().trim();
+
+
+                // Request a string response from the provided URL.
+                StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String result) {
+                                // SUCCESS - the user loged in correctly
+                                if (result.toLowerCase().equals("true")) {
+
+                                    // move to the parking activity
+                                    Intent parkingIntent = new Intent(LoginActivity.this, ParkingActivity.class);
+                                    startActivity(parkingIntent);
+
+                                    // todo -- add a session of some kind so the user doesn't need
+                                    // todo -- to constantly log in on every app start
+
+                                    // terminate this activity
+                                    finish();
+                                } else {
+                                    String msg = "Failed to log in - unrecognised username / password combination.";
+                                    Toast.makeText(v.getContext(), msg, Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(v.getContext(), "<--ERROR--> " + error.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+
+                // Add the request to the RequestQueue.
+                queue.add(stringRequest);
+            }
+        });
     }
 }
