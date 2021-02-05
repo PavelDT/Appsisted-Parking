@@ -46,7 +46,7 @@ public class RegistrationActivity extends AppCompatActivity {
                 // todo -- reuse the request queue instead of re-instantiating it
                 //         every single time a user registers
                 RequestQueue queue = Volley.newRequestQueue(v.getContext());
-                // get username
+                // get username & password from controls
                 EditText username = findViewById(R.id.editTextUsername);
                 EditText password = findViewById(R.id.editTextPassword);
                 EditText userConfirmPassword = findViewById(R.id.editTextPasswordConfirm);
@@ -62,8 +62,18 @@ public class RegistrationActivity extends AppCompatActivity {
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String result) {
-                                // Display the response
-                                Toast.makeText(v.getContext(), result, Toast.LENGTH_LONG).show();
+                                // SUCCESS - user registered
+                                if (result.toLowerCase().equals("true")) {
+                                    // move to the parking activity
+                                    // Intent is a mechanism for switching activities
+                                    Intent parkingIntent = new Intent(RegistrationActivity.this, ParkingActivity.class);
+                                    startActivity(parkingIntent);
+
+                                    // terminate this activity
+                                    finish();
+                                } else {
+                                    Toast.makeText(v.getContext(), "Registration failed!", Toast.LENGTH_LONG).show();
+                                }
                             }
                         }, new Response.ErrorListener() {
                     @Override
@@ -74,14 +84,6 @@ public class RegistrationActivity extends AppCompatActivity {
 
                 // Add the request to the RequestQueue.
                 queue.add(stringRequest);
-
-                // animate back to the login activity
-                // Intent is a mechanism for switching activities
-                Intent parkingIntent = new Intent(RegistrationActivity.this, ParkingActivity.class);
-                startActivity(parkingIntent);
-
-                // terminate this activity
-                finish();
             }
         });
     }
