@@ -89,11 +89,14 @@ public class User {
         throw new InvalidParameterException("Unknown user: " + username);
     }
 
-    public static boolean register(String username, String password) {
+    public static String register(String username, String password) {
 
         // invalid params or user already exists, fail to register
-        if (username.equals("") || password.equals("") || userExists(username)) {
-            return false;
+        if (username.equals("") || password.equals("")) {
+            return "Username / Password cannot be empty";
+        }
+        if (userExists(username)) {
+            return "Username already taken";
         }
 
         CassandraClient client = CassandraClient.getClient();
@@ -115,7 +118,9 @@ public class User {
 
         // This is dangerous in Cassandra due to the eventual consistency.
         // for that reason a high consistency level was used when registering
-        return userExists(username);
+        Boolean status = userExists(username);
+
+        return status.toString();
     }
 
     /**

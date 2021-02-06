@@ -1,11 +1,14 @@
 package com.github.paveldt.appsistedparking.view;
 
 import android.app.ActivityOptions;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.SpannableString;
 import android.text.TextPaint;
+import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.view.View;
@@ -53,6 +56,13 @@ public class RegistrationActivity extends AppCompatActivity {
                 String pass = password.getText().toString();
                 String cpass = userConfirmPassword.getText().toString();
 
+                // stop the registration if there's a problem
+                if (!pass.equals(cpass)) {
+                    Toast.makeText(v.getContext(), "Passwords don't match!", Toast.LENGTH_LONG).show();
+                    // prevent web request  kicking off
+                    return;
+                }
+
                 String url = "http://10.0.2.2:8080/user/register/?username=" +
                         username.getText().toString().trim() +
                         "&password=" + password.getText().toString().trim();
@@ -72,7 +82,7 @@ public class RegistrationActivity extends AppCompatActivity {
                                     // terminate this activity
                                     finish();
                                 } else {
-                                    Toast.makeText(v.getContext(), "Registration failed!", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(v.getContext(), "Registration failed - " + result, Toast.LENGTH_LONG).show();
                                 }
                             }
                         }, new Response.ErrorListener() {

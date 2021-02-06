@@ -18,9 +18,7 @@ public class UserController {
         String sanitizedPassword = Sanitizer.sanitizeAll(password);
 
         // register the user
-        Boolean status = User.register(sanitizedUsername, sanitizedPassword);
-
-        return status.toString();
+        return User.register(sanitizedUsername, sanitizedPassword);
     }
 
     @RequestMapping(value = "/user/login", method = RequestMethod.GET)
@@ -32,7 +30,7 @@ public class UserController {
         String sanitizedUsername = Sanitizer.sanitizeAll(username);
 
         if (!User.userExists(username)) {
-            return "false";
+            return "user does not exist";
         }
 
         User user = User.getUser(sanitizedUsername);
