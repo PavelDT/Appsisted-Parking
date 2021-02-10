@@ -32,22 +32,27 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.Arrays;
+
 
 public class MapFragment extends Fragment implements LocationListener {
 
-
-    private Location userLocation;
-
     @Override
     public void onLocationChanged(Location location) {
-        userLocation = location;
+        for (int i = 0; i < 40; i++) {
+            Log.i("<<EH>>", "\t\tLOC CHANGED!: " + location);
+        }
     }
+
+
+    private Location userLocation;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // initialize view
         View view = inflater.inflate(R.layout.fragment_map, container, false);
+
 
         // initialize map fragment
         final SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.googleMap);
@@ -59,28 +64,7 @@ public class MapFragment extends Fragment implements LocationListener {
                 // clear any default items
                 googleMap.clear();
 
-
-//                // lattitude and longtitude of the university
-//                LatLng parkingDestination = new LatLng(56.144947260528994, -3.9204526421331267);
-//                // add marker for stirling university
-//                MarkerOptions stirlingMarkerOpt = new MarkerOptions();
-//                stirlingMarkerOpt.position(parkingDestination);
-//                Marker stirlingMarker = googleMap.addMarker(stirlingMarkerOpt);
-//
-//                MarkerOptions userMarkerOpt = new MarkerOptions();
-//                userMarkerOpt.position(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()));
-//                Marker userMarker = googleMap.addMarker(stirlingMarkerOpt);
-//
-//                // todo -- remove this once the bound camera works
-//                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(parkingDestination, 2));
-
-
-                // set camera between current user's position and the parking location
-
-                // create a camera update
-
-                // update the camera
-
+                // wait for map to load before adding markers and zooms etc.
                 googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
                     @Override
                     public void onMapLoaded() {
@@ -119,98 +103,23 @@ public class MapFragment extends Fragment implements LocationListener {
                         stirlingMarker.showInfoWindow();
                     }
                 });
-
-
-//                stirlingMarker.showInfoWindow();
-
-                // todo remove this
-                // testing onclick for api keey
-                //googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-                //    @Override
-                //    public void onMapClick(LatLng latLng) {
-                //        MarkerOptions mo = new MarkerOptions();
-                //        mo.position(latLng);
-                //
-                //        googleMap.clear();
-                //
-                //        mo.title("TEST " + latLng.latitude + " " + latLng.longitude);
-                //
-                //        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
-                //        googleMap.addMarker(mo);
-                //    }
-                //});
-
             }
         });
 
         return view;
     }
 
+    public float calcDistanceToLocationKM(LatLng currentLocation, LatLng destination) {
+        float[] results = new float[1];
+        Location.distanceBetween(currentLocation.latitude, currentLocation.longitude,
+                destination.latitude, destination.longitude, results);
+
+        // the Location class api guarantees that there is only 1 result, or it throws an exception
+        return results[0];
+    }
+
     public void setUserLocation(Location locUpdate) {
         userLocation = locUpdate;
     }
 
-//    // based on https://stackoverflow.com/questions/32290045
-//    private LocationManager locationManager;
-//    protected LatLng getLocation() {
-//
-//        if (checkLocationPermission()) {
-//
-//            locationManager = (LocationManager) this.getContext().getSystemService(Context.LOCATION_SERVICE);
-//            Criteria criteria = new Criteria();
-//            String bestProvider = String.valueOf(locationManager.getBestProvider(criteria, true));
-//
-//            //You can still do this if you like, you might get lucky:
-//            Location location = locationManager.getLastKnownLocation(bestProvider);
-//            locationManager.requestLocationUpdates(bestProvider, 1000, 0, this);
-//            double lat = location.getLatitude();
-//            double lon = location.getLongitude();
-//            return new LatLng(lat, lon);
-//        } else {
-//            return null;
-//        }
-//    }
-//
-//    private boolean checkLocationPermission() {
-//        Log.i("REEE", ""  + (ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION)));
-//        Log.i("REEE", ""  + (PackageManager.PERMISSION_GRANTED));
-//
-//
-//        if(ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-//           return true;
-//        } else {
-//            Log.i("AAAAAADFASDf", "bb");
-//            String[] permissions = new String[]{"android.permission.ACCESS_FINE_LOCATION"};
-//            ActivityCompat.requestPermissions(this.getActivity(), permissions, 0);
-//        }
-//
-//        return ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-//    }
-//
-//    public void statusCheck() {
-//        final LocationManager manager = (LocationManager) this.getActivity().getSystemService(Context.LOCATION_SERVICE);
-//
-//        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-//            buildAlertMessageNoGps();
-//
-//        }
-//    }
-//
-//    private void buildAlertMessageNoGps() {
-//        final AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
-//        builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
-//                .setCancelable(false)
-//                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-//                    public void onClick(final DialogInterface dialog, final int id) {
-//                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-//                    }
-//                })
-//                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-//                    public void onClick(final DialogInterface dialog, final int id) {
-//                        dialog.cancel();
-//                    }
-//                });
-//        final AlertDialog alert = builder.create();
-//        alert.show();
-//    }
 }
