@@ -9,8 +9,10 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -26,11 +28,19 @@ import com.google.android.gms.tasks.Task;
 public class ParkingActivity extends AppCompatActivity implements LocationListener {
 
     MapFragment mapFragment;
+//    FusedLocationProviderClient fusedLocationProviderClient;
+    LocationManager locationManager;
+    String provider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_parking);
+
+        Criteria criteria = new Criteria();
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        provider = locationManager.getBestProvider(criteria, false);
+//        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         // user location and map fragment initialisation
         initMapFragment();
@@ -44,6 +54,12 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
         for (int i = 0; i < 40; i++) {
             Log.i("<<EH>>", "\t\tLOC CHANGED!: " + location);
         }
+    }
+
+    @Override
+    protected void onResume() throws SecurityException {
+        super.onResume();
+        locationManager.requestLocationUpdates(provider, 400, 1, this);
     }
 
     private void initLogoutButton() {
@@ -60,13 +76,12 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
 
     private void initMapFragment() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            // wasteful but necessary, creates a client to access location services
-            FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
             // requests last known location and triggers a callback once the location is found
-            fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
-                @Override
-                public void onComplete(@NonNull Task<Location> task) {
-                    Location location = task.getResult();
+//            fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+//                @Override
+//                public void onComplete(@NonNull Task<Location> task) {
+//                    Location location = task.getResult();
+            Location location = locationManager.getLastKnownLocation(provider);
                     if (location != null) {
                         Log.i("WIN!!!", location.toString());
 
@@ -82,17 +97,11 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
                         // this can happen on virtual devices or if location services are entirely disabled.
                         Toast.makeText(ParkingActivity.this, "Error fetching location.", Toast.LENGTH_LONG);
                     }
-                }
-            });
+//                }
+//            });
         } else {
             // request permission
             ActivityCompat.requestPermissions(ParkingActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 44);
         }
-    }
-
-    private boolean locationPermissionCheck() {
-
-
-        return false;
     }
 }
