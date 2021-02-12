@@ -54,6 +54,14 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
         for (int i = 0; i < 40; i++) {
             Log.i("<<EH>>", "\t\tLOC CHANGED!: " + location);
         }
+
+        if (mapFragment.mapReady()) {
+            for (int i = 0; i < 40; i++) {
+                Log.i("<<EH>>", "\t\tYEBOIIIIIIII!: " + location);
+            }
+            mapFragment.setUserLocation(location);
+            mapFragment.updateMapView();
+        }
     }
 
     @Override

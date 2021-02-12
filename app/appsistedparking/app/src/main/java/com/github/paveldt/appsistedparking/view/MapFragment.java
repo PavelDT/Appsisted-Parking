@@ -34,13 +34,12 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.Arrays;
-
 
 public class MapFragment extends Fragment {
 
 
     private Location userLocation;
+    private final LatLng stirlingLatLng = new LatLng(56.144947260528994, -3.9204526421331267);
     private static GoogleMap googleMap;
 
     @Override
@@ -56,16 +55,17 @@ public class MapFragment extends Fragment {
         mapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(final GoogleMap map) {
-                // creating a reference to the map object is very important and the
-                // OnMapReadCallback is the only opportunity to do so.
-                googleMap = map;
+
                 // enables zoom controls
-                googleMap.getUiSettings().setZoomControlsEnabled(true);
+                map.getUiSettings().setZoomControlsEnabled(true);
 
                 // wait for map to load before adding markers and zooms etc.
-                googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+                map.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
                     @Override
                     public void onMapLoaded() {
+                        // creating a reference to the map object is very important and the
+                        // OnMapReadCallback is the only opportunity to do so.
+                        googleMap = map;
                         updateMapView();
                     }
                 });
@@ -75,6 +75,10 @@ public class MapFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Updates the map view by updating the zoom to ensure that both the user and parking location
+     * are visibile.
+     */
     public void updateMapView() {
 
         // remove everything - removes markers, radius notations and info windows.
@@ -82,8 +86,7 @@ public class MapFragment extends Fragment {
 
         // todo - these latlongs and markers are reused in a parculiar way
         //        they could be initialized only once to save some resources.
-        // create latlons for stirling and user location
-        LatLng stirlingLatLng = new LatLng(56.144947260528994, -3.9204526421331267);
+        // create latlon for user location
         LatLng userLatLng = new LatLng(userLocation.getLatitude(), userLocation.getLongitude());
 
         // add stirling university marker
@@ -107,7 +110,7 @@ public class MapFragment extends Fragment {
         // draw a circle around the parking location to signify how close the
         // user has to get to the parking location before being instructed
         // where to park
-        drawParkingRadius(stirlingLatLng, googleMap);
+        drawParkingRadius(googleMap);
 
         // updates camera position to include the user's starting position and
         // stirling university parking. The padding ensures both locations are visible
@@ -120,12 +123,19 @@ public class MapFragment extends Fragment {
     }
 
     /**
+     * Checks if the map object is initialized and ready for usage.
+     * @return returns true if the map has completed its ready callback.
+     */
+    public boolean mapReady() {
+        return googleMap != null;
+    }
+
+    /**
      * Draws a circle around the parking location
      * The circle signifies when the user will be instructed where to park
-     * @param stirlingLatLng
      * @param googleMap
      */
-    private void drawParkingRadius(LatLng stirlingLatLng, GoogleMap googleMap) {
+    private void drawParkingRadius(GoogleMap googleMap) {
         // set the size of the radius and its center
         CircleOptions circleOptions = new CircleOptions();
         circleOptions.center(stirlingLatLng);
@@ -141,10 +151,15 @@ public class MapFragment extends Fragment {
         googleMap.addCircle(circleOptions);
     }
 
-    public float calcDistanceToLocationKM(LatLng currentLocation, LatLng destination) {
+    /**
+     * Calculates direct line distance between the user and the parking location
+     * @return float - distance in KM between the user and parking destination
+     */
+    public float calcDistanceToLocationKM() {
+
         float[] results = new float[1];
-        Location.distanceBetween(currentLocation.latitude, currentLocation.longitude,
-                destination.latitude, destination.longitude, results);
+        Location.distanceBetween(userLocation.getLatitude(), userLocation.getLongitude(),
+                stirlingLatLng.latitude, stirlingLatLng.longitude, results);
 
         // the Location class api guarantees that there is only 1 result, or it throws an exception
         return results[0];
