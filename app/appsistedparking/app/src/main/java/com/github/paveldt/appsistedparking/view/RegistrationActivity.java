@@ -1,14 +1,11 @@
 package com.github.paveldt.appsistedparking.view;
 
 import android.app.ActivityOptions;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.SpannableString;
 import android.text.TextPaint;
-import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.view.View;
