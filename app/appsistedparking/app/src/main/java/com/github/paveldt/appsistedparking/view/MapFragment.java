@@ -151,7 +151,7 @@ public class MapFragment extends Fragment {
                 stirlingLatLng.latitude, stirlingLatLng.longitude, results);
 
         // the Location class api guarantees that there is only 1 result, or it throws an exception
-        return results[0];
+        return results[0] / 1000;
     }
 
     public void setUserLocation(Location locUpdate) {

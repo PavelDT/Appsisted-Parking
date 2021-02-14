@@ -13,11 +13,18 @@
 
     </FrameLayout>
 
+    <TextView
+        android:id="@+id/distanceToLocationText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/mapFrame"
+        android:text="Calculating" />
+
     <Button
         android:id="@+id/logoutButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/mapFrame"
+        android:layout_below="@+id/distanceToLocationText"
         android:text="Logout" />
 
 </RelativeLayout>

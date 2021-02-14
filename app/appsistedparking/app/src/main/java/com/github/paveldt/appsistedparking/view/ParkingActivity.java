@@ -13,16 +13,21 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.paveldt.appsistedparking.R;
 
+import java.text.DecimalFormat;
+
 
 public class ParkingActivity extends AppCompatActivity implements LocationListener {
 
-    MapFragment mapFragment;
-    LocationManager locationManager;
-    String provider;
+    private MapFragment mapFragment;
+    private LocationManager locationManager;
+    private String provider;
+    private final DecimalFormat decimalFormat = new DecimalFormat("0.00");
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +55,12 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
         if (mapFragment.mapReady()) {
             mapFragment.setUserLocation(location);
             mapFragment.updateMapView();
+
+            // todo - current implementation relies on a location change
+            //        to update the remaining distance.
+            //        This is due to the map having to load first befure such
+            //        a calculation can occur. Not a problem, but not ideal.
+            updateDistanceRemainingTxt();
         }
     }
 
@@ -103,5 +114,20 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
             // request permission
             ActivityCompat.requestPermissions(ParkingActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 44);
         }
+    }
+
+    /**
+     * Updates the distance remaining textbox
+     */
+    private void updateDistanceRemainingTxt() {
+        // safety to ensure that map is ready for usage and idstance is ready to be calculated
+        if (!mapFragment.mapReady()) {
+            return;
+        }
+
+        float distanceRemaining = mapFragment.calcDistanceToLocationKM();
+        TextView distanceToLocationTxt = findViewById(R.id.distanceToLocationText);
+        // appends a KM to the end of the distance
+        distanceToLocationTxt.setText(String.format("%s KM", decimalFormat.format(distanceRemaining)));
     }
 }
