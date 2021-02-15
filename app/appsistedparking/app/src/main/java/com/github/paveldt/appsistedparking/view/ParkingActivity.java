@@ -2,8 +2,11 @@ package com.github.paveldt.appsistedparking.view;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
@@ -24,6 +27,7 @@ import java.text.DecimalFormat;
 public class ParkingActivity extends AppCompatActivity implements LocationListener {
 
     private MapFragment mapFragment;
+    private Fragment parkingFragment;
     private LocationManager locationManager;
     private String provider;
     private final DecimalFormat decimalFormat = new DecimalFormat("0.00");
@@ -41,8 +45,14 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
         // user location and map fragment initialisation
         initMapFragment();
 
+        // initialise the parking fragment
+        initParkingFragment();
+
         // initialize controls
         initLogoutButton();
+
+        // todo -- remove this
+        initTestButton_REMOVE();
     }
 
     /**
@@ -129,5 +139,29 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
         TextView distanceToLocationTxt = findViewById(R.id.distanceToLocationText);
         // appends a KM to the end of the distance
         distanceToLocationTxt.setText(String.format("%s KM", decimalFormat.format(distanceRemaining)));
+    }
+
+    private void initParkingFragment() {
+        parkingFragment = new ParkingFragment();
+    }
+
+    private void park() {
+
+        // hide the map fragment
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.hide(mapFragment);
+        ft.show(parkingFragment);
+        ft.commit();
+    }
+
+    // todo -- remove this
+    private void initTestButton_REMOVE() {
+        Button logoutButton = findViewById(R.id.TEST_BTN);
+        logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                park();
+            }
+        });
     }
 }
