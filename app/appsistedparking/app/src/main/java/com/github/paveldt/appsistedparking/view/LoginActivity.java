@@ -4,8 +4,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ActivityOptions;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.TextPaint;
@@ -38,6 +41,10 @@ public class LoginActivity extends AppCompatActivity {
         initRegisterLink();
         // init login button
         initLoginButton();
+
+        // as the login activity is the main entry point to the app, the notification
+        // channel is initialised here
+        createNotificationChannel();
     }
 
     /**
@@ -133,5 +140,21 @@ public class LoginActivity extends AppCompatActivity {
                 queue.add(stringRequest);
             }
         });
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String channelId = getResources().getString(R.string.notification_channel);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(channelId, channelId, importance);
+            channel.setDescription("");
+            // mute the channel, this removes oddities with TTS
+            channel.setSound(null, null);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviours after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.deleteNotificationChannel(channelId);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 }

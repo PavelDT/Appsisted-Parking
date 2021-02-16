@@ -2,18 +2,26 @@ package com.github.paveldt.appsistedparking.view;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.app.FragmentManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -22,6 +30,7 @@ import android.widget.Toast;
 import com.github.paveldt.appsistedparking.R;
 
 import java.text.DecimalFormat;
+import java.util.Locale;
 
 
 public class ParkingActivity extends AppCompatActivity implements LocationListener {
@@ -31,6 +40,8 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
     private LocationManager locationManager;
     private String provider;
     private final DecimalFormat decimalFormat = new DecimalFormat("0.00");
+    private int notificationCounter = 0;
+    private TextToSpeech tts;
 
 
     @Override
@@ -41,6 +52,9 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
         Criteria criteria = new Criteria();
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         provider = locationManager.getBestProvider(criteria, false);
+
+        // initialize text to speech
+        initTTS();
 
         // user location and map fragment initialisation
         initMapFragment();
@@ -61,6 +75,7 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
      */
     @Override
     public void onLocationChanged(Location location) {
+        Log.i("LOCATION CHANGED", "-------------------------------------------------------------------");
         // update the map positioning only if the map is ready
         if (mapFragment.mapReady()) {
             mapFragment.setUserLocation(location);
@@ -147,11 +162,39 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
 
     private void park() {
 
-        // hide the map fragment
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.hide(mapFragment);
-        ft.show(parkingFragment);
-        ft.commit();
+
+        // hide the map fragment and show the parking fragment
+        getSupportFragmentManager().beginTransaction().replace(R.id.mapFrame, parkingFragment).commit();
+
+        // notification
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, getResources().getString(R.string.notification_channel));
+        builder.setSmallIcon(R.drawable.ic_message_notification);
+        builder.setContentTitle("Appsisted Parking");
+        builder.setContentText("Park at location " + "A");
+        builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+        NotificationManager notificationManager = getSystemService(NotificationManager.class);
+        // incrementing notification count means that the notification can be re-issued multiple times
+        notificationManager.notify(notificationCounter, builder.build());
+        notificationCounter++;
+
+        // tell the user where to park via TTS
+        tts.speak("Please park at parking location one", TextToSpeech.QUEUE_FLUSH, null);
+    }
+
+    private void initTTS() {
+        tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                // initialising TTS is complex and doesn't work on all devices
+                // verify the initialization worked.
+                if (status == TextToSpeech.SUCCESS) {
+                    int lang = tts.setLanguage(Locale.ENGLISH);
+                    // Slow down TTS speed
+                    tts.setSpeechRate(0.7f);
+                }
+            }
+        });
     }
 
     // todo -- remove this
