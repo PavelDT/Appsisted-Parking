@@ -24,9 +24,16 @@ import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.github.paveldt.appsistedparking.R;
 
 import java.text.DecimalFormat;
@@ -42,6 +49,8 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
     private final DecimalFormat decimalFormat = new DecimalFormat("0.00");
     private int notificationCounter = 0;
     private TextToSpeech tts;
+    // tracks if the user is currently parked in one of the parking lots.
+    private boolean parked = false;
 
 
     @Override
@@ -154,6 +163,11 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
         TextView distanceToLocationTxt = findViewById(R.id.distanceToLocationText);
         // appends a KM to the end of the distance
         distanceToLocationTxt.setText(String.format("%s KM", decimalFormat.format(distanceRemaining)));
+
+        // 1 KM remaining to location, run the parking functionality
+        if (distanceRemaining > 1) {
+            park();
+        }
     }
 
     private void initParkingFragment() {
@@ -161,27 +175,67 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
     }
 
     private void park() {
+        final Context context = this;
+        // web request to request parking location.
+        // Instantiate the RequestQueue.
+        // todo -- reuse the request queue instead of re-instantiating it
+        //         every single time a user registers
+        RequestQueue queue = Volley.newRequestQueue(context);
+        // build request url that requires username and password as params
+        String url = "http://10.0.2.2:8080/parking/locationstatus";
 
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        // todo -- the REST serrvice is currently a place holder
+                        //         more processing of the result is required.
+                        // feed back given, user can proceed to park
+                        if (result.toLowerCase().equals("true")) {
+                            // hide the map fragment and show the parking fragment
+                            if (!parked) {
+                                // there is risk of not processing the update on the google map and thus
+                                // losing some state. Losing this state is ok as the google map needs
+                                // to be hidden once parking.
+                                getSupportFragmentManager().beginTransaction().replace(R.id.mapFrame, parkingFragment).commitAllowingStateLoss();
+                                parked = true;
+                            }
 
-        // hide the map fragment and show the parking fragment
-        getSupportFragmentManager().beginTransaction().replace(R.id.mapFrame, parkingFragment).commit();
+                            // notification
+                            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, getResources().getString(R.string.notification_channel));
+                            builder.setSmallIcon(R.drawable.ic_message_notification);
+                            builder.setContentTitle("Appsisted Parking");
+                            builder.setContentText("Park at location " + "A");
+                            builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
-        // notification
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, getResources().getString(R.string.notification_channel));
-        builder.setSmallIcon(R.drawable.ic_message_notification);
-        builder.setContentTitle("Appsisted Parking");
-        builder.setContentText("Park at location " + "A");
-        builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+                            // incrementing notification count means that the notification can be re-issued multiple times
+                            notificationManager.notify(notificationCounter, builder.build());
+                            notificationCounter++;
 
-        NotificationManager notificationManager = getSystemService(NotificationManager.class);
-        // incrementing notification count means that the notification can be re-issued multiple times
-        notificationManager.notify(notificationCounter, builder.build());
-        notificationCounter++;
+                            // tell the user where to park via TTS
+                            tts.speak("Please park at parking location one", TextToSpeech.QUEUE_FLUSH, null);
 
-        // tell the user where to park via TTS
-        tts.speak("Please park at parking location one", TextToSpeech.QUEUE_FLUSH, null);
+                        } else {
+                            String msg = "Failed to get parking status.";
+                            Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(context, "<--ERROR--> " + error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+        // Add the request to the RequestQueue.
+        queue.add(stringRequest);
     }
 
+    /**
+     * Initializes the text to speach object. Important - speech rate is set to 0.7f.
+     */
     private void initTTS() {
         tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
