@@ -3,13 +3,9 @@ package com.github.paveldt.appsistedparking.view;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
-import android.app.FragmentManager;
-import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
@@ -18,13 +14,11 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,6 +29,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.github.paveldt.appsistedparking.R;
+import com.github.paveldt.appsistedparking.model.ParkingState;
 
 import java.text.DecimalFormat;
 import java.util.Locale;
@@ -50,7 +45,7 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
     private int notificationCounter = 0;
     private TextToSpeech tts;
     // tracks if the user is currently parked in one of the parking lots.
-    private boolean parked = false;
+    private ParkingState parkingState = new ParkingState();
 
 
     @Override
@@ -164,8 +159,8 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
         // appends a KM to the end of the distance
         distanceToLocationTxt.setText(String.format("%s KM", decimalFormat.format(distanceRemaining)));
 
-        // 1 KM remaining to location, run the parking functionality
-        if (distanceRemaining > 1) {
+        // 1 KM remaining to location, run the parking functionality if the user is not parked
+        if (distanceRemaining < 1 && parkingState.getParkingState() == ParkingState.NOT_PARKED) {
             park();
         }
     }
@@ -185,44 +180,43 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
         String url = "http://10.0.2.2:8080/parking/locationstatus";
 
         // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String result) {
-                        // todo -- the REST serrvice is currently a place holder
-                        //         more processing of the result is required.
-                        // feed back given, user can proceed to park
-                        if (result.toLowerCase().equals("true")) {
-                            // hide the map fragment and show the parking fragment
-                            if (!parked) {
-                                // there is risk of not processing the update on the google map and thus
-                                // losing some state. Losing this state is ok as the google map needs
-                                // to be hidden once parking.
-                                getSupportFragmentManager().beginTransaction().replace(R.id.mapFrame, parkingFragment).commitAllowingStateLoss();
-                                parked = true;
-                            }
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String result) {
+                // todo -- the REST serrvice is currently a place holder
+                //         more processing of the result is required.
+                // feed back given, user can proceed to park
+                if (result.toLowerCase().equals("true")) {
+                    // hide the map fragment and show the parking fragment
+                    // there is risk of not processing the update on the google map and thus
+                    // losing some state. Losing this state is ok as the google map needs
+                    // to be hidden once parking.
+                    getSupportFragmentManager().beginTransaction().replace(R.id.mapFrame, parkingFragment).commitAllowingStateLoss();
 
-                            // notification
-                            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, getResources().getString(R.string.notification_channel));
-                            builder.setSmallIcon(R.drawable.ic_message_notification);
-                            builder.setContentTitle("Appsisted Parking");
-                            builder.setContentText("Park at location " + "A");
-                            builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                    // notification
+                    NotificationCompat.Builder builder = new NotificationCompat.Builder(context, getResources().getString(R.string.notification_channel));
+                    builder.setSmallIcon(R.drawable.ic_message_notification);
+                    builder.setContentTitle("Appsisted Parking");
+                    builder.setContentText("Park at location " + "A");
+                    builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
-                            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-                            // incrementing notification count means that the notification can be re-issued multiple times
-                            notificationManager.notify(notificationCounter, builder.build());
-                            notificationCounter++;
+                    NotificationManager notificationManager = getSystemService(NotificationManager.class);
+                    // incrementing notification count means that the notification can be re-issued multiple times
+                    notificationManager.notify(notificationCounter, builder.build());
+                    notificationCounter++;
 
-                            // tell the user where to park via TTS
-                            tts.speak("Please park at parking location one", TextToSpeech.QUEUE_FLUSH, null);
+                    // tell the user where to park via TTS
+                    tts.speak("Please park at parking location one", TextToSpeech.QUEUE_FLUSH, null);
 
-                        } else {
-                            String msg = "Failed to get parking status.";
-                            Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
-                        }
-                    }
-                }, new Response.ErrorListener() {
+                    // update parking state
+                    parkingState.setParkingState(ParkingState.PARKED);
+
+                } else {
+                    String msg = "Failed to get parking status.";
+                    Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                }
+            }
+        }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(context, "<--ERROR--> " + error.getMessage(), Toast.LENGTH_LONG).show();
