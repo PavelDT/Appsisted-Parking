@@ -24,13 +24,19 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.github.paveldt.appsistedparking.R;
+import com.github.paveldt.appsistedparking.util.WebRequestQueue;
 
 public class RegistrationActivity extends AppCompatActivity {
+
+    // Instantiate the RequestQueue.
+    RequestQueue queue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
+
+        RequestQueue queue = WebRequestQueue.getInstance(this);
 
         // initialise login link to navigate back to registration
         initLoginLink();
@@ -42,10 +48,6 @@ public class RegistrationActivity extends AppCompatActivity {
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                // Instantiate the RequestQueue.
-                // todo -- reuse the request queue instead of re-instantiating it
-                //         every single time a user registers
-                RequestQueue queue = Volley.newRequestQueue(v.getContext());
                 // get username & password from controls
                 EditText username = findViewById(R.id.editTextUsername);
                 EditText password = findViewById(R.id.editTextPassword);

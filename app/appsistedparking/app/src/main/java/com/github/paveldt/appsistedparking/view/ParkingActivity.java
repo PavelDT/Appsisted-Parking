@@ -30,6 +30,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.github.paveldt.appsistedparking.R;
 import com.github.paveldt.appsistedparking.model.ParkingState;
+import com.github.paveldt.appsistedparking.util.WebRequestQueue;
 
 import java.text.DecimalFormat;
 import java.util.Locale;
@@ -46,12 +47,16 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
     private TextToSpeech tts;
     // tracks if the user is currently parked in one of the parking lots.
     private ParkingState parkingState = new ParkingState();
+    private RequestQueue queue;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_parking);
+
+        // set up request queue
+        queue = WebRequestQueue.getInstance(this);
 
         Criteria criteria = new Criteria();
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -175,7 +180,6 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
         // Instantiate the RequestQueue.
         // todo -- reuse the request queue instead of re-instantiating it
         //         every single time a user registers
-        RequestQueue queue = Volley.newRequestQueue(context);
         // build request url that requires username and password as params
         String url = "http://10.0.2.2:8080/parking/locationstatus";
 
@@ -225,6 +229,10 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
 
         // Add the request to the RequestQueue.
         queue.add(stringRequest);
+    }
+
+    private void exitParkingLot() {
+
     }
 
     /**
