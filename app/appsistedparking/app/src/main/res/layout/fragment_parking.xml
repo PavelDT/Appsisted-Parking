@@ -5,10 +5,10 @@
     tools:context="com.github.paveldt.appsistedparking.view.ParkingFragment">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/parkingRecommendation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="#AA2E2E"
-        android:text="TextView" />
+        android:text="Location A - 82 available" />
 
 </RelativeLayout>

@@ -24,7 +24,10 @@ public class UserController {
     @RequestMapping(value = "/user/login", method = RequestMethod.GET)
     // @RequestMapping(value = "/user/login", method = RequestMethod.POST)
     @ResponseBody
-    public String userLogin(String username, String password){
+    public String userLogin(@RequestParam String username, @RequestParam String password){
+
+        // todo -- load user status from the user table
+        //         and return it as part of the login process
 
         String sanitizedPassword = Sanitizer.sanitizeAll(password);
         String sanitizedUsername = Sanitizer.sanitizeAll(username);

@@ -29,6 +29,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.github.paveldt.appsistedparking.R;
+import com.github.paveldt.appsistedparking.model.ParkingLocation;
 import com.github.paveldt.appsistedparking.model.ParkingState;
 import com.github.paveldt.appsistedparking.util.WebRequestQueue;
 
@@ -39,7 +40,7 @@ import java.util.Locale;
 public class ParkingActivity extends AppCompatActivity implements LocationListener {
 
     private MapFragment mapFragment;
-    private Fragment parkingFragment;
+    private ParkingFragment parkingFragment;
     private LocationManager locationManager;
     private String provider;
     private final DecimalFormat decimalFormat = new DecimalFormat("0.00");
@@ -164,9 +165,10 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
         // appends a KM to the end of the distance
         distanceToLocationTxt.setText(String.format("%s KM", decimalFormat.format(distanceRemaining)));
 
-        // 1 KM remaining to location, run the parking functionality if the user is not parked
+        // 1 KM remaining to location and user is not parked
+        // run the parking suggestion functionality
         if (distanceRemaining < 1 && parkingState.getParkingState() == ParkingState.NOT_PARKED) {
-            park();
+            suggestParkingLocation();
         }
     }
 
@@ -174,14 +176,15 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
         parkingFragment = new ParkingFragment();
     }
 
-    private void park() {
+    private void suggestParkingLocation() {
         final Context context = this;
         // web request to request parking location.
         // Instantiate the RequestQueue.
         // todo -- reuse the request queue instead of re-instantiating it
         //         every single time a user registers
         // build request url that requires username and password as params
-        String url = "http://10.0.2.2:8080/parking/locationstatus";
+        String parkingLocationName = "stirling";
+        String url = "http://10.0.2.2:8080/parking/locationstatus?location=" + parkingLocationName;
 
         // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
@@ -190,12 +193,20 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
                 // todo -- the REST serrvice is currently a place holder
                 //         more processing of the result is required.
                 // feed back given, user can proceed to park
-                if (result.toLowerCase().equals("true")) {
+                if (!result.toLowerCase().trim().equals("error") && !result.isEmpty()) {
+
+                    // todo -- remove this, its just testing
+                    ParkingLocation parkingLocation = new ParkingLocation(result);
+
                     // hide the map fragment and show the parking fragment
                     // there is risk of not processing the update on the google map and thus
                     // losing some state. Losing this state is ok as the google map needs
                     // to be hidden once parking.
                     getSupportFragmentManager().beginTransaction().replace(R.id.mapFrame, parkingFragment).commitAllowingStateLoss();
+
+                    // todo -- this causes a crash.
+                    // this must occur after the fragments are switched
+                    // parkingFragment.updateParkingRecommendation(parkingLocation);
 
                     // notification
                     NotificationCompat.Builder builder = new NotificationCompat.Builder(context, getResources().getString(R.string.notification_channel));
@@ -213,7 +224,7 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
                     tts.speak("Please park at parking location one", TextToSpeech.QUEUE_FLUSH, null);
 
                     // update parking state
-                    parkingState.setParkingState(ParkingState.PARKED);
+                    parkingState.setParkingState(ParkingState.PARKING);
 
                 } else {
                     String msg = "Failed to get parking status.";
@@ -229,6 +240,10 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
 
         // Add the request to the RequestQueue.
         queue.add(stringRequest);
+    }
+
+    private void park() {
+
     }
 
     private void exitParkingLot() {
@@ -259,7 +274,7 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                park();
+                suggestParkingLocation();
             }
         });
     }

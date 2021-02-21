@@ -1,15 +1,22 @@
 package com.github.pavelt.appsistedparking.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import com.github.pavelt.appsistedparking.model.ParkingSite;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class ParkingController {
 
     @RequestMapping(value = "/parking/locationstatus", method = RequestMethod.GET)
-    public String locationStatus(){
+    @ResponseBody
+    public String locationStatus(@RequestParam String location){
 
-        return "true";
+        // todo -- maybe update user state from not_parked to PARKING
+        return ParkingSite.getLocationInfo(location);
+    }
+
+    @RequestMapping(value = "/parking/park", method = RequestMethod.GET)
+    @ResponseBody
+    public String park(@RequestParam String location, @RequestParam String parkingSite) {
+        return "";
     }
 }

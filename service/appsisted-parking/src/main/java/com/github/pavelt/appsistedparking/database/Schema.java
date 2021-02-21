@@ -10,6 +10,9 @@ public class Schema {
         if (createUserSchema()) {
             createdTables.add("user");
         }
+        if (createParkingSite()) {
+            createdTables.add("parkingsite");
+        }
 
         return createdTables;
     }
@@ -40,6 +43,55 @@ public class Schema {
 
         // function complete to this point without error
         // schema created successfully
+        return true;
+    }
+
+    private boolean createParkingSite() {
+        String keyspace = "appsisted";
+        String table = "parkingsite";
+
+        // IF NOT EXISTS allows this statement to run multiple times without throwing an exception
+        // this is essentially an idempotent query thanks to the 'IF NOT EXISTS'
+        StringBuilder keyspaceQuery = new StringBuilder().append("CREATE KEYSPACE IF NOT EXISTS ")
+                .append(keyspace)
+                .append(" WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 3};");
+
+        StringBuilder tableQuery = new StringBuilder().append("CREATE TABLE IF NOT EXISTS ")
+                .append(keyspace)
+                .append(".")
+                .append(table)
+                .append(" (location text, site text, capacity int, available int, lat float, lon float, ")
+                .append("PRIMARY KEY(location, site))");
+
+        CassandraClient session = CassandraClient.getClient();
+        session.execute(keyspaceQuery.toString());
+        session.execute(tableQuery.toString());
+
+        // reaching this far means a successful table creation
+        return true;
+    }
+
+    private boolean populateParkingSite() {
+        String keyspace = "appsisted";
+        String table = "parkingsite";
+
+        String site1 = "INSERT INTO " + keyspace + "." + table +
+                " (location, site, capacity, available, lat, lon) " +
+                " VALUES ('stirling', 'ONE', 100, 100, 0.0, 0.0)";
+
+        String site2 = "INSERT INTO " + keyspace + "." + table +
+                " (location, site, capacity, available, lat, lon) " +
+                " VALUES ('stirling', 'TWO', 50, 50, 0.0, 0.0)";
+
+        String site3 = "INSERT INTO " + keyspace + "." + table +
+                " (location, site, capacity, available, lat, lon) " +
+                " VALUES ('stirling', 'THREE', 30, 30, 0.0, 0.0)";
+
+        CassandraClient session = CassandraClient.getClient();
+        session.execute(site1);
+        session.execute(site2);
+        session.execute(site3);
+
         return true;
     }
 }
