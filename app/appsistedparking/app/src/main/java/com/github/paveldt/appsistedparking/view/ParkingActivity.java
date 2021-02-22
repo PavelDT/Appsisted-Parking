@@ -3,7 +3,6 @@ package com.github.paveldt.appsistedparking.view;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
-import androidx.fragment.app.Fragment;
 
 import android.Manifest;
 import android.app.NotificationManager;
@@ -27,9 +26,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.github.paveldt.appsistedparking.R;
-import com.github.paveldt.appsistedparking.model.ParkingLocation;
 import com.github.paveldt.appsistedparking.model.ParkingState;
 import com.github.paveldt.appsistedparking.util.WebRequestQueue;
 
@@ -138,7 +135,7 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
                 mapFragment.setUserLocation(location);
 
                 // open the map fragment
-                getSupportFragmentManager().beginTransaction().replace(R.id.mapFrame, mapFragment).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentFrame, mapFragment).commit();
 
             } else {
                 // nothing to do, location is inaccessible
@@ -194,19 +191,16 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
                 //         more processing of the result is required.
                 // feed back given, user can proceed to park
                 if (!result.toLowerCase().trim().equals("error") && !result.isEmpty()) {
-
-                    // todo -- remove this, its just testing
-                    ParkingLocation parkingLocation = new ParkingLocation(result);
-
                     // hide the map fragment and show the parking fragment
                     // there is risk of not processing the update on the google map and thus
                     // losing some state. Losing this state is ok as the google map needs
                     // to be hidden once parking.
-                    getSupportFragmentManager().beginTransaction().replace(R.id.mapFrame, parkingFragment).commitAllowingStateLoss();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentFrame, parkingFragment).commitAllowingStateLoss();
 
                     // todo -- this causes a crash.
                     // this must occur after the fragments are switched
-                    // parkingFragment.updateParkingRecommendation(parkingLocation);
+                    // todo -- format this properly
+                    parkingFragment.setParkingInfo(result);
 
                     // notification
                     NotificationCompat.Builder builder = new NotificationCompat.Builder(context, getResources().getString(R.string.notification_channel));

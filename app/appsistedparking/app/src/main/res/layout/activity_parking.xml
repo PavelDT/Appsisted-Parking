@@ -7,7 +7,7 @@
     tools:context="com.github.paveldt.appsistedparking.view.ParkingActivity">
 
     <FrameLayout
-        android:id="@+id/mapFrame"
+        android:id="@+id/fragmentFrame"
         android:layout_width="match_parent"
         android:layout_height="400dp">
 
@@ -17,7 +17,7 @@
         android:id="@+id/distanceToLocationText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/mapFrame"
+        android:layout_below="@+id/fragmentFrame"
         android:text="Calculating" />
 
     <Button
