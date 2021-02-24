@@ -1,7 +1,15 @@
 package com.github.pavelt.appsistedparking.controller;
 
 import com.github.pavelt.appsistedparking.model.ParkingSite;
+import com.github.pavelt.appsistedparking.model.QRCode;
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.BufferedImageHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.bind.annotation.*;
+
+import java.awt.image.BufferedImage;
 
 @RestController
 public class ParkingController {
@@ -18,5 +26,16 @@ public class ParkingController {
     @ResponseBody
     public String park(@RequestParam String location, @RequestParam String parkingSite) {
         return "";
+    }
+
+//    @GetMapping(value = "/barbecue/ean13/{barcode}", produces = MediaType.IMAGE_PNG_VALUE)
+    @RequestMapping(value = "/parking/qrcode", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
+    public BufferedImage barbecueEAN13Barcode() throws Exception {
+        return QRCode.generateQRCodeImage("FDASFASF");
+    }
+
+    @Bean
+    public HttpMessageConverter<BufferedImage> createImageHttpMessageConverter() {
+        return new BufferedImageHttpMessageConverter();
     }
 }
