@@ -15,23 +15,51 @@
 
     <TextView
         android:id="@+id/distanceToLocationText"
+        android:textColor="@android:color/black"
+        android:layout_marginTop="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="25sp"
+        android:layout_centerHorizontal="true"
         android:layout_below="@+id/fragmentFrame"
-        android:text="Calculating" />
+        android:text="\?\? KM" />
+
+    <TextView
+        android:id="@+id/distanceToLocationLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:textColor="@android:color/black"
+        android:layout_below="@+id/distanceToLocationText"
+        android:text="Distance to location" />
+
+    <Button
+        android:id="@+id/qrScanButton"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_centerHorizontal="true"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/distanceToLocationLabel"
+        android:text="Scan QR" />
 
     <Button
         android:id="@+id/logoutButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/distanceToLocationText"
+        android:layout_below="@+id/qrScanButton"
         android:text="Logout" />
+
 
     <Button
         android:id="@+id/TEST_BTN"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/logoutButton"
+        android:layout_below="@id/qrScanButton"
+        android:layout_toRightOf="@id/logoutButton"
         android:text="TEST" />
+
+
 
 </RelativeLayout>

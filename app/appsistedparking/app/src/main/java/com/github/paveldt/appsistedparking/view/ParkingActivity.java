@@ -1,5 +1,6 @@
 package com.github.paveldt.appsistedparking.view;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -9,6 +10,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -29,6 +31,8 @@ import com.android.volley.toolbox.StringRequest;
 import com.github.paveldt.appsistedparking.R;
 import com.github.paveldt.appsistedparking.model.ParkingState;
 import com.github.paveldt.appsistedparking.util.WebRequestQueue;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 import java.text.DecimalFormat;
 import java.util.Locale;
@@ -71,6 +75,9 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
 
         // initialize controls
         initLogoutButton();
+
+        // initialize button to activate camera for QR code scanning
+        initQRScanButton();
 
         // todo -- remove this
         initTestButton_REMOVE();
@@ -173,6 +180,53 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
         parkingFragment = new ParkingFragment();
     }
 
+    private void initQRScanButton() {
+        Button qrScanButton = findViewById(R.id.qrScanButton);
+        disableQRButton();
+        qrScanButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                // implementation based on: youtube.com/watch?v=u2pgSu9RhYo
+                // activate camera and look for QR Code
+                IntentIntegrator ii = new IntentIntegrator(ParkingActivity.this);
+                ii.setPrompt("Access camera for QR Code scan");
+                // set orientation to be locked
+                ii.setOrientationLocked(true);
+                // set the activity to carry out the capture of the qr code
+                ii.setCaptureActivity(QRCaptureActivity.class);
+                ii.initiateScan();
+            }
+        });
+    }
+
+    private void disableQRButton() {
+        Button qrScanButton = findViewById(R.id.qrScanButton);
+        // set gray colour to default to the button looking disabled.
+        qrScanButton.setBackgroundColor(Color.LTGRAY);
+        qrScanButton.setEnabled(false);
+
+    }
+
+    private void enableQRButton() {
+        Button qrScanButton = findViewById(R.id.qrScanButton);
+        qrScanButton.setBackgroundColor(Color.BLACK);
+        qrScanButton.setEnabled(true);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // intent to handle the result
+        IntentResult ir = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        // check if data was back
+        if (ir.getContents() != null) {
+            Log.i("444444444", ir.getContents());
+        } else {
+            Log.i("444444444", "FAIL");
+        }
+    }
+
     private void suggestParkingLocation() {
         final Context context = this;
         // web request to request parking location.
@@ -219,6 +273,9 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
 
                     // update parking state
                     parkingState.setParkingState(ParkingState.PARKING);
+
+                    // enable the QR scan button
+                    enableQRButton();
 
                 } else {
                     String msg = "Failed to get parking status.";
