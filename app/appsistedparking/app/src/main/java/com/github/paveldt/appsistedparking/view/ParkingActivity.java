@@ -29,6 +29,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.github.paveldt.appsistedparking.R;
+import com.github.paveldt.appsistedparking.model.ParkingLocation;
 import com.github.paveldt.appsistedparking.model.ParkingState;
 import com.github.paveldt.appsistedparking.util.WebRequestQueue;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -251,16 +252,16 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
                     // to be hidden once parking.
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragmentFrame, parkingFragment).commitAllowingStateLoss();
 
-                    // todo -- this causes a crash.
-                    // this must occur after the fragments are switched
-                    // todo -- format this properly
-                    parkingFragment.setParkingInfo(result);
+                    // parse the json response into an ojbect and send it to the parking fragment
+                    ParkingLocation pl = new ParkingLocation(result);
+                    parkingFragment.setParkingInfo(pl);
 
                     // notification
                     NotificationCompat.Builder builder = new NotificationCompat.Builder(context, getResources().getString(R.string.notification_channel));
                     builder.setSmallIcon(R.drawable.ic_message_notification);
-                    builder.setContentTitle("Appsisted Parking");
-                    builder.setContentText("Park at location " + "A");
+                    builder.setContentTitle("Parking Recommendation");
+                    builder.setContentText("Park at lot " + pl.getRecommendedLocation() +
+                                           " with " + pl.getAvailableSpots() + " available spots.");
                     builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
                     NotificationManager notificationManager = getSystemService(NotificationManager.class);
@@ -269,7 +270,9 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
                     notificationCounter++;
 
                     // tell the user where to park via TTS
-                    tts.speak("Please park at parking location one", TextToSpeech.QUEUE_FLUSH, null);
+                    String txt = "Please park at parking lot " + pl.getRecommendedLocation().toLowerCase() +
+                                 " with " + pl.getAvailableSpots() + " available spots";
+                    tts.speak(txt, TextToSpeech.QUEUE_FLUSH, null);
 
                     // update parking state
                     parkingState.setParkingState(ParkingState.PARKING);

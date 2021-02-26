@@ -1,14 +1,62 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout  xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginStart="10dp"
     tools:context="com.github.paveldt.appsistedparking.view.ParkingFragment">
 
-    <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:id="@+id/parkingInfoLabel"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="Parking Recommendation"
+        android:textSize="20sp" />
+
     <TextView
         android:id="@+id/parkingInfo"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:textColor="@android:color/black"
+        android:textSize="30sp"
+        android:layout_below="@id/parkingInfoLabel" />
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/spotsAvailableInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:textColor="@android:color/black"
+        android:textSize="30sp"
+        android:layout_below="@id/parkingInfo" />
+
+    <TextView
+        android:id="@+id/otherInfoLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/spotsAvailableInfo"
+        android:text="Other Parking Locations"
+        android:textSize="20sp" />
+
+    <ScrollView
+        android:layout_below="@id/otherInfoLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TableLayout
+                android:id="@+id/otherLocationsTable"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            </TableLayout>
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

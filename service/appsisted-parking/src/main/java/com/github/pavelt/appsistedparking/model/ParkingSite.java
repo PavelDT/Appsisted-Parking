@@ -7,6 +7,7 @@ import com.datastax.oss.driver.api.core.cql.Row;
 import com.github.pavelt.appsistedparking.database.CassandraClient;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -46,12 +47,42 @@ public class ParkingSite {
         // verify that the result was turned into json correctly
         try {
             // turn the string representation of the data into a json array
-            JSONArray test = new JSONArray(result.toString());
-            return result.toString();
+            // and make a recommendation
+            return recommend(new JSONArray(result.toString()));
         } catch (JSONException jex) {
             // failed to fetch data as json, log the exception and return an error.
             jex.printStackTrace();
             return "ERROR";
         }
+    }
+
+    private static String recommend(JSONArray json) throws JSONException {
+
+        int mostSpotsAvailable = 0;
+        String recommendedSite = "";
+
+        // todo -- this needs to take account user preferences
+        //         can be added in later on
+        // recommend the most empty parking lot.
+        for (int i = 0; i < json.length(); i++) {
+            JSONObject jo = json.getJSONObject(i);
+            int availableSpots = jo.getInt("available");
+            int capacity = jo.getInt("capacity");
+
+            if (availableSpots > mostSpotsAvailable) {
+                recommendedSite = jo.getString("site");
+                mostSpotsAvailable = availableSpots;
+            }
+        }
+
+        // replace first character which denotes the start of the array, aka "["
+        // and put in the "[" again, the recomendation object and a comma
+        // the effect of this is that the recommendation is appended at the start
+        String jsonStr = json.toString();
+        // format: {"recommended":"ONE","available-spots":100}
+        String recommendation = "{\"recommended\":\"" + recommendedSite + "\",\"available-spots\":" + mostSpotsAvailable + "}";
+        jsonStr = jsonStr.replaceFirst("\\[", "[" + recommendation + ",");
+
+        return jsonStr;
     }
 }

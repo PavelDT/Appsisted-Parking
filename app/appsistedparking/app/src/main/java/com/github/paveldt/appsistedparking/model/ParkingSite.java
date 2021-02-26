@@ -18,4 +18,11 @@ public class ParkingSite {
         this.lat = lat;
     }
 
+    public String getSite() {
+        return site;
+    }
+
+    public int getAvailable() {
+        return available;
+    }
 }
