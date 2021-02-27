@@ -2,6 +2,7 @@ package com.github.pavelt.appsistedparking.database;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Schema {
 
@@ -60,7 +61,7 @@ public class Schema {
                 .append(keyspace)
                 .append(".")
                 .append(table)
-                .append(" (location text, site text, capacity int, available int, lat float, lon float, ")
+                .append(" (location text, site text, capacity int, available int, lat float, lon float, code text, ")
                 .append("PRIMARY KEY(location, site))");
 
         CassandraClient session = CassandraClient.getClient();
@@ -76,16 +77,16 @@ public class Schema {
         String table = "parkingsite";
 
         String site1 = "INSERT INTO " + keyspace + "." + table +
-                " (location, site, capacity, available, lat, lon) " +
-                " VALUES ('stirling', 'ONE', 100, 100, 0.0, 0.0)";
+                " (location, site, capacity, available, lat, lon, code) " +
+                " VALUES ('stirling', 'ONE', 100, 100, 0.0, 0.0, '" + UUID.randomUUID().toString() + "')";
 
         String site2 = "INSERT INTO " + keyspace + "." + table +
-                " (location, site, capacity, available, lat, lon) " +
-                " VALUES ('stirling', 'TWO', 50, 50, 0.0, 0.0)";
+                " (location, site, capacity, available, lat, lon, code) " +
+                " VALUES ('stirling', 'TWO', 50, 50, 0.0, 0.0, '" + UUID.randomUUID().toString() + "')";
 
         String site3 = "INSERT INTO " + keyspace + "." + table +
-                " (location, site, capacity, available, lat, lon) " +
-                " VALUES ('stirling', 'THREE', 30, 30, 0.0, 0.0)";
+                " (location, site, capacity, available, lat, lon, code) " +
+                " VALUES ('stirling', 'THREE', 30, 30, 0.0, 0.0, '" + UUID.randomUUID().toString() + "')";
 
         CassandraClient session = CassandraClient.getClient();
         session.execute(site1);

@@ -16,7 +16,8 @@ public class ParkingSite {
     public static String getLocationInfo(String location) {
         // Using "json" infront of the column specification allows cassandra to
         // return the result as a json formatted object.
-        String query = "SELECT json * FROM appsisted.parkingsite WHERE location=?";
+        String query = "SELECT json location, site, available, capacity, lat, lon " +
+                       "FROM appsisted.parkingsite WHERE location=?";
 
         PreparedStatement ps = CassandraClient.getClient().prepare(query);
         BoundStatement bs = ps.bind(location.toLowerCase());
@@ -84,5 +85,10 @@ public class ParkingSite {
         jsonStr = jsonStr.replaceFirst("\\[", "[" + recommendation + ",");
 
         return jsonStr;
+    }
+
+    private boolean decrementAvailable(String code, String location, String site) {
+
+        return true;
     }
 }

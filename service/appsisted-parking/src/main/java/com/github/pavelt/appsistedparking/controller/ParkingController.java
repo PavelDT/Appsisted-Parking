@@ -30,8 +30,8 @@ public class ParkingController {
 
 //    @GetMapping(value = "/barbecue/ean13/{barcode}", produces = MediaType.IMAGE_PNG_VALUE)
     @RequestMapping(value = "/parking/qrcode", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
-    public BufferedImage barbecueEAN13Barcode() throws Exception {
-        return QRCode.generateQRCodeImage("FDASFASF");
+    public BufferedImage barbecueEAN13Barcode(@RequestParam String location, @RequestParam String site) throws Exception {
+        return QRCode.generateQRCodeImage(location, site);
     }
 
     @Bean
