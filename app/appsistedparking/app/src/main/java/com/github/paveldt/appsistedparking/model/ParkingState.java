@@ -2,6 +2,8 @@ package com.github.paveldt.appsistedparking.model;
 
 public class ParkingState {
 
+    private static ParkingState instance;
+
     // default to not being parked
     private int parkingState = 0;
 
@@ -10,11 +12,25 @@ public class ParkingState {
     public final static int PARKED = 11;
     public final static int EXITING_PARKING_LOT = 20;
 
+    // private constructor to enforce singleton
+    private ParkingState() {}
+
+    public static ParkingState getInstance() {
+
+        if (instance == null) {
+            instance = new ParkingState();
+        }
+
+        return instance;
+    }
+
     public int getParkingState() {
-        return parkingState;
+        return instance.parkingState;
     }
 
     public void setParkingState(int newState) {
-        parkingState = newState;
+        instance.parkingState = newState;
     }
+
+
 }
