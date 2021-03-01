@@ -87,8 +87,60 @@ public class ParkingSite {
         return jsonStr;
     }
 
-    private boolean decrementAvailable(String code, String location, String site) {
+    /**
+     * Reduces or increases the parking spots available for a given location
+     * @param location
+     * @param site
+     * @param increment - boolean stating whether to increment (when true) or decrement (false) the
+     *                  number of available spots.
+     * @return - boolean representing if the reduction was carried out successfully
+     */
+    public static boolean modifyAvailable(String location, String site, boolean increment) {
+
+        // get available slots
+        int available = getAvailableSlots(location, site);
+
+        if (increment) {
+            available = available + 1;
+        } else {
+            available = available - 1;
+        }
+
+        String query = "UPDATE appsisted.parkingsite SET available=? WHERE location=? AND site=?";
+
+        // bind the query
+        PreparedStatement ps = CassandraClient.getClient().prepare(query);
+        BoundStatement bs = ps.bind((available),location, site);
+
+        // run the query
+        CassandraClient.getClient().execute(bs);
 
         return true;
+    }
+
+    private static int getAvailableSlots(String location, String site) {
+        // WARNING - this is a read before write and is considered bad in cassandra.
+        // this system can handle it as its very synchronous, it shouldn't be possible
+        // for two users to enter the parking lot at the same time
+        // there is some risk when a user enters as another is leaving.
+        // A different safer implementation could be to use cassandra counters
+        String queryCount = "SELECT available FROM appsisted.parkingsite WHERE location=? AND site=?;";
+        // bind the location and site to the query
+        PreparedStatement ps = CassandraClient.getClient().prepare(queryCount);
+        BoundStatement bs = ps.bind(location, site);
+
+        // fetch the result and verify that only 1 item was found.
+        ResultSet rs = CassandraClient.getClient().execute(bs);
+        List<Row> all = rs.all();
+        if (all.size() != 1) {
+            throw new RuntimeException("Unexpected number of results for code of parking location -- " +
+                    "Should be exactly 1 but was " + all.size());
+        }
+
+        return all.get(0).getInt("available");
+    }
+
+    public static void main(String[] args) {
+        modifyAvailable("stirling", "ONE", true);
     }
 }

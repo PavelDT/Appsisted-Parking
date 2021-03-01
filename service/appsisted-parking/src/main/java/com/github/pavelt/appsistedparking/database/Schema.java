@@ -76,17 +76,20 @@ public class Schema {
         String keyspace = "appsisted";
         String table = "parkingsite";
 
+        String code1 = "stirling+ONE+14129a27-c38e-4f0b-a40b-220e944062d3";
         String site1 = "INSERT INTO " + keyspace + "." + table +
                 " (location, site, capacity, available, lat, lon, code) " +
-                " VALUES ('stirling', 'ONE', 100, 100, 0.0, 0.0, '" + UUID.randomUUID().toString() + "')";
+                " VALUES ('stirling', 'ONE', 100, 100, 0.0, 0.0, '" + code1 + "')";
 
+        String code2 = "stirling+TWO+" + UUID.randomUUID().toString();
         String site2 = "INSERT INTO " + keyspace + "." + table +
                 " (location, site, capacity, available, lat, lon, code) " +
-                " VALUES ('stirling', 'TWO', 50, 50, 0.0, 0.0, '" + UUID.randomUUID().toString() + "')";
+                " VALUES ('stirling', 'TWO', 50, 50, 0.0, 0.0, '" + code2 + "')";
 
+        String code3 = "stirling+THREE+" + UUID.randomUUID().toString();
         String site3 = "INSERT INTO " + keyspace + "." + table +
                 " (location, site, capacity, available, lat, lon, code) " +
-                " VALUES ('stirling', 'THREE', 30, 30, 0.0, 0.0, '" + UUID.randomUUID().toString() + "')";
+                " VALUES ('stirling', 'THREE', 30, 30, 0.0, 0.0, '" + code3 + "')";
 
         CassandraClient session = CassandraClient.getClient();
         session.execute(site1);
@@ -94,5 +97,11 @@ public class Schema {
         session.execute(site3);
 
         return true;
+    }
+
+    public static void main(String[] args) {
+        Schema s = new Schema();
+        s.createParkingSite();
+        s.populateParkingSite();
     }
 }

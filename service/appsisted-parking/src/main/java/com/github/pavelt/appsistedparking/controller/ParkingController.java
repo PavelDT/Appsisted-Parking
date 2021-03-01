@@ -24,13 +24,37 @@ public class ParkingController {
 
     @RequestMapping(value = "/parking/park", method = RequestMethod.GET)
     @ResponseBody
-    public String park(@RequestParam String location, @RequestParam String parkingSite) {
-        return "";
+    public String park(@RequestParam String qrCode) {
+
+        System.out.println(qrCode);
+        System.out.println(qrCode);
+        System.out.println(qrCode);
+        System.out.println(qrCode);
+        System.out.println(qrCode);
+        System.out.println(qrCode);
+
+        String data[] = qrCode.split("\\+");
+        String location = data[0];
+        String parkingSite = data[1];
+
+        // the third component of the split is never used on its own
+        // the verification process is interested in the full QR code
+        // not just the UUID
+        if (QRCode.verifyParkingCode(location, parkingSite, qrCode)) {
+            // reduce the space available for that parking lot.
+            ParkingSite.modifyAvailable(location, parkingSite, false);
+            // rotate the parking code
+            QRCode.rotateCode(location, parkingSite);
+
+            return "true";
+        }
+
+        // failed to park as codes didn't match
+        return "false";
     }
 
-//    @GetMapping(value = "/barbecue/ean13/{barcode}", produces = MediaType.IMAGE_PNG_VALUE)
     @RequestMapping(value = "/parking/qrcode", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
-    public BufferedImage barbecueEAN13Barcode(@RequestParam String location, @RequestParam String site) throws Exception {
+    public BufferedImage displayLocationQRCode(@RequestParam String location, @RequestParam String site) throws Exception {
         return QRCode.generateQRCodeImage(location, site);
     }
 

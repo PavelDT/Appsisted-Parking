@@ -12,10 +12,34 @@ import com.google.zxing.qrcode.QRCodeWriter;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.UUID;
 
 public class QRCode {
     public static BufferedImage generateQRCodeImage(String location, String site) throws Exception {
 
+        // fetch the code of the parking location and site from the database
+        String code = fetchCode(location, site);
+
+        // Create a QR Code
+        QRCodeWriter barcodeWriter = new QRCodeWriter();
+        BitMatrix bitMatrix = barcodeWriter.encode(code, BarcodeFormat.QR_CODE, 200, 200);
+
+        return MatrixToImageWriter.toBufferedImage(bitMatrix);
+    }
+
+    public static boolean verifyParkingCode(String location, String site, String qrCode) {
+        // fetch the code and state if it matches.
+        String code = fetchCode(location, site);
+        return qrCode.equals(code);
+    }
+
+    /**
+     * Fetches the uuid code currently representing the parking lot
+     * @param location - the location of the parking lot
+     * @param site - the parking lot site
+     * @return A UUID in string format representing the parking lot
+     */
+    private static String fetchCode(String location, String site) {
         // fetch the code from the database
         String query = "SELECT code FROM appsisted.parkingsite WHERE location=? AND site=?";
 
@@ -32,12 +56,23 @@ public class QRCode {
         }
 
         // exactly one result was identified as expected, proceed to generate the image
-        String code = all.get(0).getString("code");
+        return all.get(0).getString("code");
+    }
 
-        // Create a QR Code
-        QRCodeWriter barcodeWriter = new QRCodeWriter();
-        BitMatrix bitMatrix = barcodeWriter.encode(code, BarcodeFormat.QR_CODE, 200, 200);
+    public static void rotateCode(String location, String site) {
+        String query = "UPDATE appsisted.parkingsite SET code=? WHERE location=? AND site=?";
 
-        return MatrixToImageWriter.toBufferedImage(bitMatrix);
+        String newCode = location + "+" + site + "+" + UUID.randomUUID().toString();
+
+        // bind the query
+        PreparedStatement ps = CassandraClient.getClient().prepare(query);
+        BoundStatement bs = ps.bind(newCode, location, site);
+
+        // run the query
+        CassandraClient.getClient().execute(bs);
+    }
+
+    public static void main(String[] args) {
+        rotateCode("stirling", "TWO");
     }
 }
