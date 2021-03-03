@@ -4,7 +4,6 @@ import com.github.pavelt.appsistedparking.model.ParkingSite;
 import com.github.pavelt.appsistedparking.model.QRCode;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.BufferedImageHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.bind.annotation.*;
@@ -26,13 +25,6 @@ public class ParkingController {
     @ResponseBody
     public String park(@RequestParam String qrCode) {
 
-        System.out.println(qrCode);
-        System.out.println(qrCode);
-        System.out.println(qrCode);
-        System.out.println(qrCode);
-        System.out.println(qrCode);
-        System.out.println(qrCode);
-
         String data[] = qrCode.split("\\+");
         String location = data[0];
         String parkingSite = data[1];
@@ -51,6 +43,17 @@ public class ParkingController {
 
         // failed to park as codes didn't match
         return "false";
+    }
+
+    @RequestMapping(value = "/parking/exit", method = RequestMethod.GET)
+    @ResponseBody
+    public String exitParkinglot(@RequestParam String location, @RequestParam String site) {
+
+        if (ParkingSite.modifyAvailable(location, site, true)) {
+            return "true";
+        }
+        
+        return  "false";
     }
 
     @RequestMapping(value = "/parking/qrcode", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)

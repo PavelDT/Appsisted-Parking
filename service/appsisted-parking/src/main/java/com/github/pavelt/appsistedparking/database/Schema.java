@@ -68,6 +68,9 @@ public class Schema {
         session.execute(keyspaceQuery.toString());
         session.execute(tableQuery.toString());
 
+        // add predetermined parking locations
+        populateParkingSite();
+
         // reaching this far means a successful table creation
         return true;
     }
@@ -101,7 +104,7 @@ public class Schema {
 
     public static void main(String[] args) {
         Schema s = new Schema();
+        s.createUserSchema();
         s.createParkingSite();
-        s.populateParkingSite();
     }
 }
