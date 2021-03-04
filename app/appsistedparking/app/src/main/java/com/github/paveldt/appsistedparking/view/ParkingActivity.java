@@ -180,6 +180,12 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
         if (distanceRemaining < 1 && parkingState.getParkingState() == ParkingState.NOT_PARKED) {
             suggestParkingLocation();
         }
+
+        // when exiting the parking lot, once further than 1.05 KM (1km and 50 meters) change the
+        // state to not_parked.
+        if (parkingState.getParkingState() == ParkingState.EXITING_PARKING_LOT && distanceRemaining > 1.05) {
+            parkingState.setParkingState(ParkingState.NOT_PARKED);
+        }
     }
 
     private void initParkingFragment() {
@@ -352,8 +358,9 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
         queue.add(stringRequest);
     }
 
-    private void exitParkingLot() {
-
+    public void exitParkingLotFragmentSwitch() {
+        // switch from parked fragment to map fragment
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentFrame, mapFragment).commitAllowingStateLoss();
     }
 
     /**

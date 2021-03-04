@@ -73,7 +73,7 @@ public class ParkedFragment extends Fragment {
                     public void onResponse(String result) {
                         // if exit parking was correct && parking state is parked.
                         if (result.toLowerCase().equals("true")) {
-                            ParkingState.getInstance().setParkingState(ParkingState.NOT_PARKED);
+                            ParkingState.getInstance().setParkingState(ParkingState.EXITING_PARKING_LOT);
                             Toast.makeText(context, "Exited parking lot successfully", Toast.LENGTH_LONG).show();
                         }
                     }
@@ -89,6 +89,8 @@ public class ParkedFragment extends Fragment {
                 if (parkingState == ParkingState.PARKED) {
                     // Add the request to the RequestQueue.
                     queue.add(stringRequest);
+                    // update fragments to go back to the map fragment
+                    ((ParkingActivity)getActivity()).exitParkingLotFragmentSwitch();
                 } else {
                     String msg = "Error - invalid state detected. Exiting parking lot while not parked.";
                     Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
