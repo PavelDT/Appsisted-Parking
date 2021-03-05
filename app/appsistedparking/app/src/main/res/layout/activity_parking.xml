@@ -9,7 +9,7 @@
     <FrameLayout
         android:id="@+id/fragmentFrame"
         android:layout_width="match_parent"
-        android:layout_height="400dp">
+        android:layout_height="450dp">
 
     </FrameLayout>
 
@@ -29,26 +29,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
         android:textColor="@android:color/black"
         android:layout_below="@+id/distanceToLocationText"
         android:text="Distance to location" />
 
     <Button
-        android:id="@+id/qrScanButton"
-        android:textColor="@android:color/white"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
-        android:layout_centerHorizontal="true"
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/distanceToLocationLabel"
-        android:text="Scan QR" />
-
-    <Button
         android:id="@+id/logoutButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/qrScanButton"
+        android:layout_below="@+id/distanceToLocationLabel"
         android:text="Logout" />
 
 
@@ -56,7 +46,7 @@
         android:id="@+id/TEST_BTN"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/qrScanButton"
+        android:layout_below="@id/distanceToLocationLabel"
         android:layout_toRightOf="@id/logoutButton"
         android:text="TEST" />
 
