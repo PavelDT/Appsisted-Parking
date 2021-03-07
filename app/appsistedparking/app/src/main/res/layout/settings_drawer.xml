@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginStart="20dp">
+
+    <TextView
+        android:id="@+id/settingsLabelTitle"
+        android:layout_marginTop="30dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="30sp"
+        android:text="Settings" />
+
+    <TextView
+        android:id="@+id/settingsLabelLocation"
+        android:paddingTop="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Preferred Location"
+        android:minWidth="200dp"
+        android:layout_below="@+id/settingsLabelTitle" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:prompt="@string/app_name"
+        android:id="@+id/locationSpinner"
+        android:minWidth="200dp"
+        android:layout_below="@+id/settingsLabelLocation" />
+
+    <TextView
+        android:id="@+id/settingsLabelSite"
+        android:paddingTop="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Preferred Site"
+        android:minWidth="200dp"
+        android:layout_below="@+id/locationSpinner" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:prompt="@string/app_name"
+        android:id="@+id/siteSpinner"
+        android:minWidth="200dp"
+        android:layout_below="@+id/settingsLabelSite" />
+
+    <Button
+        android:id="@+id/updateSettingsBtn"
+        android:layout_marginTop="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/siteSpinner"
+        android:minWidth="200dp"
+        android:text="Update Settings" />
+
+    <Button
+        android:id="@+id/logoutBtn"
+        android:layout_marginTop="30dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/updateSettingsBtn"
+        android:textColor="@android:color/white"
+        android:backgroundTint="@android:color/black"
+        android:minWidth="200dp"
+        android:text="Logout" />
+
+
+</RelativeLayout>
