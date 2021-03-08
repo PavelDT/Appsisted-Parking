@@ -36,7 +36,7 @@ public class RegistrationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
 
-        RequestQueue queue = WebRequestQueue.getInstance(this);
+        queue = WebRequestQueue.getInstance(this);
 
         // initialise login link to navigate back to registration
         initLoginLink();
@@ -49,7 +49,7 @@ public class RegistrationActivity extends AppCompatActivity {
             @Override
             public void onClick(final View v) {
                 // get username & password from controls
-                EditText username = findViewById(R.id.editTextUsername);
+                final EditText username = findViewById(R.id.editTextUsername);
                 EditText password = findViewById(R.id.editTextPassword);
                 EditText userConfirmPassword = findViewById(R.id.editTextPasswordConfirm);
                 String pass = password.getText().toString();
@@ -76,6 +76,10 @@ public class RegistrationActivity extends AppCompatActivity {
                                     // move to the parking activity
                                     // Intent is a mechanism for switching activities
                                     Intent parkingIntent = new Intent(RegistrationActivity.this, ParkingActivity.class);
+                                    // pass param for user to parking activity
+                                    parkingIntent.putExtra("username", username.getText().toString().trim());
+                                    parkingIntent.putExtra("location", "none");
+                                    parkingIntent.putExtra("site", "none");
                                     startActivity(parkingIntent);
 
                                     // terminate this activity

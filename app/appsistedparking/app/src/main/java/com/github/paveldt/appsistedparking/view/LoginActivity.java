@@ -14,6 +14,7 @@ import android.text.SpannableString;
 import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -28,7 +29,11 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.github.paveldt.appsistedparking.R;
 import com.github.paveldt.appsistedparking.util.Animation;
+import com.github.paveldt.appsistedparking.util.JSONUtil;
 import com.github.paveldt.appsistedparking.util.WebRequestQueue;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -101,7 +106,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(final View v) {
                 // get username & password from controls
-                EditText username = findViewById(R.id.editTextUsername);
+                final EditText username = findViewById(R.id.editTextUsername);
                 EditText password = findViewById(R.id.editTextPassword);
 
                 // build request url that requires username and password as params
@@ -115,21 +120,28 @@ public class LoginActivity extends AppCompatActivity {
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String result) {
-                                // SUCCESS - the user loged in correctly
-                                if (result.toLowerCase().equals("true")) {
+                                try {
+                                    final JSONObject user = JSONUtil.jsonStrToObject(result);
+                                    // SUCCESS - the user logged in correctly
+                                    if (user.getString("username").equals(username.getText().toString().trim())) {
 
-                                    // move to the parking activity
-                                    Intent parkingIntent = new Intent(LoginActivity.this, ParkingActivity.class);
-                                    startActivity(parkingIntent);
+                                        // move to the parking activity
+                                        Intent parkingIntent = new Intent(LoginActivity.this, ParkingActivity.class);
+                                        // pass param for user to parking activity
+                                        parkingIntent.putExtra("username", username.getText().toString().trim());
+                                        // update preference settings
+                                        parkingIntent.putExtra("location", user.getString("settingLocation"));
+                                        parkingIntent.putExtra("site", user.getString("settingSite"));
+                                        startActivity(parkingIntent);
 
-                                    // todo -- add a session of some kind so the user doesn't need
-                                    // todo -- to constantly log in on every app start
-
-                                    // terminate this activity
-                                    finish();
-                                } else {
-                                    String msg = "Failed to log in - unrecognised username / password combination.";
-                                    Toast.makeText(v.getContext(), msg, Toast.LENGTH_LONG).show();
+                                        // terminate this activity
+                                        finish();
+                                    } else {
+                                        String msg = "Failed to log in - unrecognised username / password combination.";
+                                        Toast.makeText(v.getContext(), msg, Toast.LENGTH_LONG).show();
+                                    }
+                                } catch (JSONException jex) {
+                                    Log.e("Login", "Failed to handle user login response");
                                 }
                             }
                         }, new Response.ErrorListener() {
@@ -145,8 +157,12 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Needed for the ability to issue notifications to the android OS
+     */
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // channel name must be unique and can only be create once per device.
             String channelId = getResources().getString(R.string.notification_channel);
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(channelId, channelId, importance);

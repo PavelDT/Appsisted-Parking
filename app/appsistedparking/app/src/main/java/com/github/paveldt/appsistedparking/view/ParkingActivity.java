@@ -1,9 +1,11 @@
 package com.github.paveldt.appsistedparking.view;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.Manifest;
 import android.app.NotificationManager;
@@ -19,7 +21,10 @@ import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,13 +36,22 @@ import com.android.volley.toolbox.StringRequest;
 import com.github.paveldt.appsistedparking.R;
 import com.github.paveldt.appsistedparking.model.ParkingLocation;
 import com.github.paveldt.appsistedparking.model.ParkingState;
+import com.github.paveldt.appsistedparking.model.User;
+import com.github.paveldt.appsistedparking.util.JSONUtil;
 import com.github.paveldt.appsistedparking.util.WebRequestQueue;
+import com.google.android.material.navigation.NavigationView;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.lang.reflect.Array;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 
@@ -54,7 +68,9 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
     // tracks if the user is currently parked in one of the parking lots.
     private ParkingState parkingState = ParkingState.getInstance();
     private RequestQueue queue;
-
+    // user data
+    User user;
+    ActionBarDrawerToggle toggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +83,15 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
         Criteria criteria = new Criteria();
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         provider = locationManager.getBestProvider(criteria, false);
+
+        // initialise user object holding metadata
+        Bundle b = getIntent().getExtras();
+        if (b == null) {
+            // something went wrong
+            throw new RuntimeException("Failed to load user details");
+        } else {
+            initUser(b.getString("username"), b.getString("location"), b.getString("site"));
+        }
 
         // initialize text to speech
         initTTS();
@@ -81,8 +106,14 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
         // initialize controls
         initLogoutButton();
 
-        // todo -- remove this
-        initTestButton_REMOVE();
+        // initialize slide menu
+        initToggleDrawer();
+
+        // initialize settings drawer options
+        initSettings();
+
+        // initialize update settings button
+        initUpdateSettingsButton();
     }
 
     /**
@@ -119,7 +150,11 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
      * Initializes the logout button
      */
     private void initLogoutButton() {
-        Button logoutButton = findViewById(R.id.logoutButton);
+        // in order to access the drawer panel, the parent menu needs to be referenced
+        // access the NavigationView that stores the panel
+        final NavigationView parentView = findViewById(R.id.navViewDrawer);
+        // use the navigation view to get the header, and then the button in the header
+        final Button logoutButton = parentView.getHeaderView(0).findViewById(R.id.logoutBtn);
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
@@ -130,6 +165,70 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
                 finish();
             }
         });
+    }
+
+    /**
+     * Initializes the update settings button in the drawer panel.
+     * Enables user to modify their settings
+     */
+    private void initUpdateSettingsButton() {
+        // in order to access the drawer panel, the parent menu needs to be referenced
+        // access the NavigationView that stores the panel
+        final NavigationView parentView = findViewById(R.id.navViewDrawer);
+        // use the navigation view to get the header, and then the button in the header
+        final Button updateSettingsButton = parentView.getHeaderView(0).findViewById(R.id.updateSettingsBtn);
+        final Spinner locationSpinner = parentView.getHeaderView(0).findViewById(R.id.locationSpinner);
+        final Spinner siteSpinner = parentView.getHeaderView(0).findViewById(R.id.siteSpinner);
+
+        final Context context = this;
+
+        updateSettingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // store the selections of settings
+                String location = (String) locationSpinner.getSelectedItem();
+                String site = (String) siteSpinner.getSelectedItem();
+
+                String url = "http://10.0.2.2:8080/user/settings/update?username=" + URLEncoder.encode(user.getUsername()) +
+                        "&location=" + URLEncoder.encode(location) +
+                        "&site=" + URLEncoder.encode(site);
+
+                // Request a string response from the provided URL.
+                StringRequest stringRequest = new StringRequest(Request.Method.PUT, url, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        // display a message to the user
+                        if (result.toLowerCase().equals("true")) {
+                            Toast.makeText(context, "Successfully updated settings", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(context, "Failed to updated settings", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(context, "Error updating settings " + error.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+
+                // Add the request to the RequestQueue.
+                queue.add(stringRequest);
+            }
+        });
+    }
+
+    /**
+     * Initialises user object - lifecycle is one per login
+     * @param username - username of user
+     * @param location - preferred parking location of user
+     * @param site - preferred site of parking of user
+     */
+    private void initUser(String username, String location, String site) {
+        if (location.equals("none")) {
+            user = new User(username);
+        } else {
+            user = new User(username, location, site);
+        }
     }
 
     /**
@@ -162,7 +261,7 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
      * Updates the distance remaining textbox
      */
     private void updateDistanceRemainingTxt() {
-        // safety to ensure that map is ready for usage and idstance is ready to be calculated
+        // safety to ensure that map is ready for usage and distance is ready to be calculated
         if (!mapFragment.mapReady()) {
             return;
         }
@@ -216,7 +315,7 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
         // Instantiate the RequestQueue.
         // build request url that requires username and password as params
         String parkingLocationName = "stirling";
-        String url = "http://10.0.2.2:8080/parking/locationstatus?location=" + parkingLocationName;
+        String url = "http://10.0.2.2:8080/location/status?location=" + parkingLocationName;
 
         // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
@@ -303,14 +402,103 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
         });
     }
 
-    // todo -- remove this
-    private void initTestButton_REMOVE() {
-        Button testButton = findViewById(R.id.TEST_BTN);
-        testButton.setOnClickListener(new View.OnClickListener() {
+    private void initToggleDrawer() {
+        DrawerLayout drawerLayout = findViewById(R.id.parkingLayoutDrawer);
+        toggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+    }
+
+    /**
+     * This function is very overloaded due to the poor web-request framework
+     * Initialises settings and allows user to save / update settings.
+     */
+    private void initSettings() {
+
+        final Context context = this;
+        // web request to request parking directory of all locations and sites.
+        String url = "http://10.0.2.2:8080/location/";
+
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
-            public void onClick(final View v) {
-                suggestParkingLocation();
+            public void onResponse(String result) {
+                if (!result.equals("")) {
+                    // parse json array to String array
+                    List<String> locations = new ArrayList<>();
+                    locations.add("none");
+                    locations.addAll(JSONUtil.jsonToStringList(result));
+
+                    // in order to access the drawer panel, the parent menu needs to be referenced
+                    // access the NavigationView that stores the panel
+                    final NavigationView parentView = findViewById(R.id.navViewDrawer);
+                    // use the navigation view to get the header, and then the spinner in the header
+                    final Spinner locationSettingSpinner = parentView.getHeaderView(0).findViewById(R.id.locationSpinner);
+
+                    ArrayAdapter adapter = new ArrayAdapter(context, android.R.layout.simple_spinner_item, locations);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    //Setting the ArrayAdapter data on the Spinner
+                    locationSettingSpinner.setAdapter(adapter);
+
+                    if (!user.getPreferredLocation().equals("none")) {
+                        // force the spinners to set the correct value
+                        int index = adapter.getPosition(user.getPreferredLocation());
+                        locationSettingSpinner.setSelection(index);
+                    }
+
+                    // set what to do when an item is selected
+                    // another web request for the below dropdown
+                    locationSettingSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                            // set url and encode the location
+                            String innerUrl = "http://10.0.2.2:8080/location/site?location=" + URLEncoder.encode(locationSettingSpinner.getSelectedItem().toString());
+                            StringRequest stringRequest = new StringRequest(Request.Method.GET, innerUrl, new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String result) {
+                                    List<String> sites = new ArrayList<>();
+                                    sites.add("none");
+                                    sites.addAll(JSONUtil.jsonToStringList(result));
+                                    // update the dropdown to store the sites for the location
+                                    Spinner siteSettingSpinner = parentView.getHeaderView(0).findViewById(R.id.siteSpinner);
+                                    ArrayAdapter adapter = new ArrayAdapter(context, android.R.layout.simple_spinner_item, sites);
+                                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                    //Setting the ArrayAdapter data on the Spinner
+                                    siteSettingSpinner.setAdapter(adapter);
+
+                                    if (!user.getPreferredLocation().equals("none") && !user.getPreferredSite().equals("none")) {
+                                        // force the spinners to set the correct value
+                                        int index = adapter.getPosition(user.getPreferredSite());
+                                        siteSettingSpinner.setSelection(index);
+                                    }
+                                }
+                            }, new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    Toast.makeText(context, "Error loading settings: " + error.getMessage(), Toast.LENGTH_LONG).show();
+                                }
+                            });
+
+                            // add the 2nd request.
+                            queue.add(stringRequest);
+                        }
+
+                        @Override
+                        public void onNothingSelected(AdapterView<?> parent) {}
+                    });
+                } else {
+                    String msg = "Failed to get parking status.";
+                    Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(context, "Error loading settings: " + error.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
+
+        // Add the request to the RequestQueue.
+        queue.add(stringRequest);
     }
 }
