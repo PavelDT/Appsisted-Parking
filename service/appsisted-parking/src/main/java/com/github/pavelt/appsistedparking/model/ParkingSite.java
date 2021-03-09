@@ -9,7 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.List;
+import java.util.*;
 
 public class ParkingSite {
 
@@ -116,6 +116,51 @@ public class ParkingSite {
         CassandraClient.getClient().execute(bs);
 
         return true;
+    }
+
+    public static List<String> getLocations() {
+        // a set is used to ensure that repeating locations are only used once
+        // locations can repeat as they can have multiple sites
+        Set<String> locations = new HashSet<>();
+
+        // fetch all locations
+        String query = "SELECT location FROM appsisted.parkingsite;";
+
+        PreparedStatement ps = CassandraClient.getClient().prepare(query);
+        BoundStatement bs = ps.bind();
+
+        // execute the query
+        ResultSet rs = CassandraClient.getClient().execute(bs);
+        List<Row> all = rs.all();
+
+        // append each location to the list
+        for (Row r : all) {
+            locations.add(r.getString("location"));
+        }
+
+        return new ArrayList<>(locations);
+    }
+
+    public static List<String> getSites(String location) {
+        List<String> sites = new ArrayList<>();
+
+        // fetch all sites
+        String query = "SELECT site FROM appsisted.parkingsite WHERE location=?;";
+
+        PreparedStatement ps = CassandraClient.getClient().prepare(query);
+        BoundStatement bs = ps.bind(location);
+
+        // execute the query
+        ResultSet rs = CassandraClient.getClient().execute(bs);
+        List<Row> all = rs.all();
+
+        // for every entry, add it to the map based on location as the key
+        for (Row r : all) {
+            // key is the location, value is the site
+            sites.add(r.getString("site"));
+        }
+
+        return sites;
     }
 
     private static int getAvailableSlots(String location, String site) {

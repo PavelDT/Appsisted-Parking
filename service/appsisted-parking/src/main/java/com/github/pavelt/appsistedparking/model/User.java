@@ -2,7 +2,6 @@ package com.github.pavelt.appsistedparking.model;
 
 
 import com.datastax.oss.driver.api.core.ConsistencyLevel;
-import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.BoundStatement;
 import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
@@ -15,49 +14,61 @@ import java.util.List;
 
 public class User {
 
-    String username;
-    String password;
-    String salt;
+    private String username;
+    private String password;
+    private String salt;
+    private String settingLocation;
+    private String settingSite;
 
-    public User (String username, String password, String salt) {
+    public User (String username, String password, String salt, String settingLocation, String settingSite) {
         this.username = username;
         this.password = password;
         this.salt = salt;
+        this.settingLocation = settingLocation;
+        this.settingSite = settingSite;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
+    /**
+     * Getter for user password
+     * @return - pw hash
+     */
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
+    /**
+     * Getter for user salt
+     * @return - salt hash
+     */
     public String getSalt() {
         return salt;
     }
 
-    public void setSalt(String salt) {
-        this.salt = salt;
+    /**
+     * Gets username of user
+     * @return - String username
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * Gets location setting of user
+     * @return - String representation of location
+     */
+    public String getSettingLocation() {
+        return settingLocation;
+    }
+
+    /**
+     * Gets user site setting
+     * @return - String user site setting
+     */
+    public String getSettingSite() {
+        return settingSite;
     }
 
     // Below is the database access layer
-
-    public boolean register() {
-
-        // check if user exists
-        //     if not create them
-
-        return true;
-    }
 
     public static User getUser(String username) {
         String query = "SELECT * FROM appsisted.user WHERE username=?";
@@ -79,8 +90,10 @@ public class User {
             String uname = all.get(0).getString("username");
             String passw = all.get(0).getString("password");
             String salt = all.get(0).getString("salt");
+            String location = all.get(0).getString("setting_location");
+            String site = all.get(0).getString("setting_site");
 
-            return new User(uname, passw, salt);
+            return new User(uname, passw, salt, location, site);
         }
 
         // no such user exists, or multiple users with same username
@@ -89,6 +102,12 @@ public class User {
         throw new InvalidParameterException("Unknown user: " + username);
     }
 
+    /**
+     * Registeres the user
+     * @param username - username chosen
+     * @param password - user's pasword
+     * @return - String representing status of registration
+     */
     public static String register(String username, String password) {
 
         // invalid params or user already exists, fail to register
@@ -100,7 +119,8 @@ public class User {
         }
 
         CassandraClient client = CassandraClient.getClient();
-        String query = "INSERT INTO appsisted.user (username, password, salt) VALUES (?, ?, ?);";
+        String query = "INSERT INTO appsisted.user (username, password, salt, setting_location, setting_site) " +
+                       "VALUES (?, ?, ?, 'none', 'none');";
 
         String salt = PasswordManager.getInstance().generateSalt();
         String hash = PasswordManager.getInstance().hashPassword(salt, password);
@@ -143,5 +163,24 @@ public class User {
         }
 
         return false;
+    }
+
+    /**
+     * Updates user's prefered parking location and site
+     * @param username - User's username to find them
+     * @param location - preferred location
+     * @param site - preferred site
+     * @return - boolean representing success of the update
+     */
+    public static boolean updateSettings(String username, String location, String site) {
+        String query = "UPDATE appsisted.user SET setting_location=?, setting_site=? WHERE username=?";
+        PreparedStatement ps = CassandraClient.getClient().prepare(query);
+        BoundStatement bs = ps.bind(location, site, username);
+
+        // execute the update
+        CassandraClient.getClient().execute(bs).one();
+
+        // no exception, update succeeded
+        return true;
     }
 }

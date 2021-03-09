@@ -21,26 +21,29 @@ public class UserController {
         return User.register(sanitizedUsername, sanitizedPassword);
     }
 
-    @RequestMapping(value = "/user/login", method = RequestMethod.GET)
+    @RequestMapping(value = "/user/login", produces = ("application/json"), method = RequestMethod.GET)
     // @RequestMapping(value = "/user/login", method = RequestMethod.POST)
     @ResponseBody
-    public String userLogin(@RequestParam String username, @RequestParam String password){
+    public User userLogin(@RequestParam String username, @RequestParam String password){
 
-        // todo -- load user status from the user table
-        //         and return it as part of the login process
+        // a secure way to say no user returned. send back a blank one
+        User emptyUser = new User("", "", "", "none", "none");
 
         String sanitizedPassword = Sanitizer.sanitizeAll(password);
         String sanitizedUsername = Sanitizer.sanitizeAll(username);
 
         if (!User.userExists(username)) {
-            return "user does not exist";
+            return emptyUser;
         }
 
         User user = User.getUser(sanitizedUsername);
         // verify password
         Boolean verified = PasswordManager.getInstance().verifyPassword(user.getPassword(), user.getSalt(), sanitizedPassword);
-
-        return verified.toString();
+        if (verified) {
+            return user;
+        } else {
+            return emptyUser;
+        }
     }
 
     @RequestMapping(value = "/user/logout", method = RequestMethod.GET)
@@ -58,5 +61,15 @@ public class UserController {
             return "true";
         }
         return "false - " + username;
+    }
+
+    @RequestMapping(value = "/user/settings/update", method = RequestMethod.PUT)
+    @ResponseBody
+    public String updateSettings(@RequestParam String username, @RequestParam String location, @RequestParam String site) {
+        if (User.updateSettings(Sanitizer.sanitizeAll(username), Sanitizer.sanitizeAll(location), Sanitizer.sanitizeAll(site))) {
+            return "true";
+        }
+
+        return "false";
     }
 }
