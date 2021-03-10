@@ -5,17 +5,16 @@ import com.github.pavelt.appsistedparking.security.Sanitizer;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 public class LocationController {
 
     @RequestMapping(value = "/location/status", method = RequestMethod.GET)
     @ResponseBody
-    public String getStatus(@RequestParam String location){
+    public String getStatus(@RequestParam String location, @RequestParam String site, @RequestParam String username){
 
         // todo -- maybe update user state from not_parked to PARKING
-        return ParkingSite.getLocationInfo(Sanitizer.sanitizeAll(location));
+        return ParkingSite.getLocationInfo(Sanitizer.sanitizeAll(location), Sanitizer.sanitizeAll(site), Sanitizer.sanitizeAll(username));
     }
 
     @RequestMapping(value = "/location/", produces={"application/json"}, method = RequestMethod.GET)
