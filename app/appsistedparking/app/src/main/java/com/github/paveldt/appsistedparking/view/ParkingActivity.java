@@ -314,8 +314,9 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
         // web request to request parking location.
         // Instantiate the RequestQueue.
         // build request url that requires username and password as params
-        String parkingLocationName = "stirling";
-        String url = "http://10.0.2.2:8080/location/status?location=" + parkingLocationName;
+        String url = "http://10.0.2.2:8080/location/status?location=" + URLEncoder.encode(user.getPreferredLocation()) +
+                "&site=" + URLEncoder.encode(user.getPreferredSite()) +
+                "&username=" + URLEncoder.encode(user.getUsername());
 
         // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
