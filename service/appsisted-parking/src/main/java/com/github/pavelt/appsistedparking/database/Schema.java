@@ -79,13 +79,13 @@ public class Schema {
         String keyspace = "appsisted";
         String table = "parkingsite";
 
-        String code1 = "stirling+Cottrell+14129a27-c38e-4f0b-a40b-220e944062d3";
+        String code1 = "stirling+Willow Court+14129a27-c38e-4f0b-a40b-220e944062d3";
         String site2 = "INSERT INTO " + keyspace + "." + table +
                 " (location, site, capacity, available, lat, lon, code) " +
                 " VALUES ('stirling', 'Willow Court', 200, 200, 56.149451, -3.922113, '" + code1 + "')";
 
 
-        String code2 = "stirling+Willow Court+" + UUID.randomUUID().toString();
+        String code2 = "stirling+Cottrell+" + UUID.randomUUID().toString();
         String site1 = "INSERT INTO " + keyspace + "." + table +
                 " (location, site, capacity, available, lat, lon, code) " +
                 " VALUES ('stirling', 'Cottrell', 130, 130, 56.143046, -3.919445, '" + code2 + "')";
