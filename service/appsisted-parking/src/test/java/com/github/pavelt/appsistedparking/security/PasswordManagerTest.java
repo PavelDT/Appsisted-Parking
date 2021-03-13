@@ -1,15 +1,16 @@
 package com.github.pavelt.appsistedparking.security;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.springframework.test.util.AssertionErrors.assertTrue;
 
-@SpringBootTest
+@RunWith(SpringRunner.class)
 public class PasswordManagerTest {
 
     @Test
-    void hashPassword() {
+    public void hashPassword() {
         // test checks if a password can be hashed correctly via the password manger
         // generateds a salt,
         // hashes the password
