@@ -23,7 +23,7 @@ public class AppsistedParkingApplicationTests {
 			// success, test can pass.
 			throw new RuntimeException("Port not in use - service isn't running.");
 		} catch (IOException e) {
-			// all good, port is in use, service should be running.
+			// all good, port is in use, service should be running.	
 		}
 	}
 
