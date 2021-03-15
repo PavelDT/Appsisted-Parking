@@ -1,7 +1,6 @@
 package com.github.pavelt.appsistedparking;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -23,7 +22,7 @@ public class AppsistedParkingApplicationTests {
 			// success, test can pass.
 			throw new RuntimeException("Port not in use - service isn't running.");
 		} catch (IOException e) {
-			// all good, port is in use, service should be running.	
+			// all good, port is in use, service should be running.
 		}
 	}
 

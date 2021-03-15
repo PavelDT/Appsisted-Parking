@@ -1,6 +1,8 @@
 package com.github.pavelt.appsistedparking;
 
 
+import com.github.pavelt.appsistedparking.model.QRCodeTest;
+import com.github.pavelt.appsistedparking.model.UserTest;
 import com.github.pavelt.appsistedparking.security.PasswordManagerTest;
 import com.github.pavelt.appsistedparking.security.SanitizerTest;
 import org.junit.AfterClass;
@@ -8,14 +10,15 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         AppsistedParkingApplicationTests.class,
         PasswordManagerTest.class,
-        SanitizerTest.class
+        SanitizerTest.class,
+        UserTest.class,
+        QRCodeTest.class
 })
 public class TestSuite {
 
@@ -27,9 +30,6 @@ public class TestSuite {
      */
     @BeforeClass
     public static void setup() {
-
-        // start Cassandra
-
         // start web service
         cap = SpringApplication.run(AppsistedParkingApplication.class, "");
     }
