@@ -6,6 +6,10 @@ import java.util.UUID;
 
 public class Schema {
 
+    /**
+     * Creates all needed schema for the appsisted-parking application.
+     * @return - List of Strings represented tables created.
+     */
     public List<String> createAllSchema() {
         List<String> createdTables = new ArrayList<>();
         if (createUserSchema()) {
@@ -19,7 +23,7 @@ public class Schema {
     }
 
     /**
-     * creates cassandra keyspaces and tables AKA the schema.
+     * creates cassandra keyspaces and tables for the user.
      * @return boolean - whether the creation succeeded or not
      */
     private boolean createUserSchema(){
@@ -47,6 +51,10 @@ public class Schema {
         return true;
     }
 
+    /**
+     * creates cassandra keyspaces and tables for the parking infrastructure.
+     * @return boolean - whether the creation succeeded or not
+     */
     private boolean createParkingSite() {
         String keyspace = "appsisted";
         String table = "parkingsite";
@@ -75,7 +83,11 @@ public class Schema {
         return true;
     }
 
-    private boolean populateParkingSite() {
+    /**
+     * Populates pre-selected parking locations and their sites.
+     * @return
+     */
+    private void populateParkingSite() {
         String keyspace = "appsisted";
         String table = "parkingsite";
 
@@ -105,13 +117,5 @@ public class Schema {
         session.execute(site2);
         session.execute(site3);
         session.execute(site4);
-
-        return true;
-    }
-
-    public static void main(String[] args) {
-        Schema s = new Schema();
-        s.createUserSchema();
-        s.createParkingSite();
     }
 }

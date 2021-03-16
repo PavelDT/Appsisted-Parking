@@ -70,6 +70,11 @@ public class User {
 
     // Below is the database access layer
 
+    /**
+     * Fetches user from database based on username
+     * @param username - the username of the user. Must be unique.
+     * @return - A User object representing the user.
+     */
     public static User getUser(String username) {
         String query = "SELECT * FROM appsisted.user WHERE username=?";
 
