@@ -1,6 +1,5 @@
 package com.github.pavelt.appsistedparking.controller;
 
-import com.github.pavelt.appsistedparking.database.CassandraClient;
 import com.github.pavelt.appsistedparking.model.User;
 import com.github.pavelt.appsistedparking.security.PasswordManager;
 import com.github.pavelt.appsistedparking.security.Sanitizer;

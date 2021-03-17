@@ -1,6 +1,5 @@
 package com.github.pavelt.appsistedparking.security;
 
-import org.apache.tools.ant.taskdefs.SubAnt;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
