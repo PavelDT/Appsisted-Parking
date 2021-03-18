@@ -54,4 +54,14 @@ public class User {
     public String getPreferredSite() {
         return preferredSite;
     }
+
+    /**
+     * Updates in-memory the location and site after a successful DB update.
+     * @param preferredLocation - the new preffered location
+     * @param preferredSite - the new preffered site
+     */
+    public void updataSettings(String preferredLocation, String preferredSite) {
+        this.preferredLocation = preferredLocation;
+        this.preferredSite = preferredSite;
+    }
 }

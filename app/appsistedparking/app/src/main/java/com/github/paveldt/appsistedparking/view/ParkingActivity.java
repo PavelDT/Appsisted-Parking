@@ -193,6 +193,9 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
                         "&location=" + URLEncoder.encode(location) +
                         "&site=" + URLEncoder.encode(site);
 
+                // update the user object.
+                user.updataSettings(location, site);
+
                 // Request a string response from the provided URL.
                 StringRequest stringRequest = new StringRequest(Request.Method.PUT, url, new Response.Listener<String>() {
                     @Override
