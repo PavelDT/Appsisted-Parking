@@ -20,6 +20,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 }
 
 dependencies {
@@ -41,4 +45,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     // drawer menu compatibility
     implementation 'com.google.android.material:material:1.4.0-alpha01'
+    // enable testing android's json library in unit tests
+    testImplementation 'org.json:json:20180813'
 }

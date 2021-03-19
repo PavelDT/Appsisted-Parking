@@ -25,4 +25,9 @@ public class ParkingSite {
     public int getAvailable() {
         return available;
     }
+
+    @Override
+    public String toString() {
+        return location + " " +  site + " " +  available+ " " + capacity+ " " +  lon+ " " + lat;
+    }
 }
