@@ -12,7 +12,6 @@ import java.util.List;
 public class SchemaController {
 
     @RequestMapping(value = "/schema/createall", method = RequestMethod.GET)
-    // @RequestMapping(value = "/schema/createall", method = RequestMethod.PUT)
     @ResponseBody
     public String createAll(){
         Schema schema = new Schema();

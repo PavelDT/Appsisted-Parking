@@ -62,12 +62,10 @@ public class CassandraClient {
         return session.execute(stringStatement);
     }
 
-    public String testConnection(){
-        Map<UUID, Node> nodes = session.getMetadata().getNodes();
-        if (nodes.size() > 0) {
-            return nodes.toString();
-        }
-
-        return "No nodes identified";
+    /**
+     * Used for shutting down the client. The client runs on a thread that will never stop, unless explicitly told to.
+     */
+    public void shutDownClient() {
+        session.close();
     }
 }

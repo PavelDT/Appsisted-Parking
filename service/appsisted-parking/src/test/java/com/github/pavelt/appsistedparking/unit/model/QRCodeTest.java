@@ -1,5 +1,6 @@
-package com.github.pavelt.appsistedparking.model;
+package com.github.pavelt.appsistedparking.unit.model;
 
+import com.github.pavelt.appsistedparking.model.QRCode;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;

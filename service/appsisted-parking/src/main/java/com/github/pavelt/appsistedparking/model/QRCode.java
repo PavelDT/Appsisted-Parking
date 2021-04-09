@@ -4,6 +4,7 @@ import com.datastax.oss.driver.api.core.cql.BoundStatement;
 import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.Row;
+import com.datastax.oss.driver.shaded.guava.common.annotations.VisibleForTesting;
 import com.github.pavelt.appsistedparking.database.CassandraClient;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
@@ -29,7 +30,8 @@ public class QRCode {
      * @return BufferedImage holding the QR Code.
      * @throws Exception
      */
-    static BufferedImage generateImage(String code) throws Exception {
+    @VisibleForTesting
+    public static BufferedImage generateImage(String code) throws Exception {
         // Create a QR Code
         QRCodeWriter barcodeWriter = new QRCodeWriter();
         BitMatrix bitMatrix = barcodeWriter.encode(code, BarcodeFormat.QR_CODE, 200, 200);

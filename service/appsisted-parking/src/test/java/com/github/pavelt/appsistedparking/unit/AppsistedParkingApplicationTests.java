@@ -1,4 +1,4 @@
-package com.github.pavelt.appsistedparking;
+package com.github.pavelt.appsistedparking.unit;
 
 import org.junit.Before;
 import org.junit.Test;

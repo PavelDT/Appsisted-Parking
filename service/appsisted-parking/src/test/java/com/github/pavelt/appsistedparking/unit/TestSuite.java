@@ -1,10 +1,11 @@
-package com.github.pavelt.appsistedparking;
+package com.github.pavelt.appsistedparking.unit;
 
 
-import com.github.pavelt.appsistedparking.model.QRCodeTest;
-import com.github.pavelt.appsistedparking.model.UserTest;
-import com.github.pavelt.appsistedparking.security.PasswordManagerTest;
-import com.github.pavelt.appsistedparking.security.SanitizerTest;
+import com.github.pavelt.appsistedparking.AppsistedParkingApplication;
+import com.github.pavelt.appsistedparking.unit.model.QRCodeTest;
+import com.github.pavelt.appsistedparking.unit.model.UserTest;
+import com.github.pavelt.appsistedparking.unit.security.PasswordManagerTest;
+import com.github.pavelt.appsistedparking.unit.security.SanitizerTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
