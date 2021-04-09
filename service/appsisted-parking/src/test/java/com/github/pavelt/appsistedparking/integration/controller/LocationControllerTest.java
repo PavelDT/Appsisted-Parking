@@ -25,8 +25,8 @@ public class LocationControllerTest {
     public static boolean runTests() {
         try {
             getStatusTest();
-            //getLocationsTest();
-            //getSitesTest();
+            getLocationsTest();
+            getSitesTest();
             cleanupUser();
         } catch (Exception ex) {
             System.out.println("Location Controller Test failed");
