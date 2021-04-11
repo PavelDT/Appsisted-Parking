@@ -24,7 +24,7 @@ public class UserController {
     public User userLogin(@RequestParam String username, @RequestParam String password){
 
         // a secure way to say no user returned. send back a blank one
-        User emptyUser = new User("", "", "", "none", "none");
+        User emptyUser = new User("", "", "", "none", "none", 0f);
 
         String sanitizedPassword = Sanitizer.sanitizeAll(password);
         String sanitizedUsername = Sanitizer.sanitizeAll(username);

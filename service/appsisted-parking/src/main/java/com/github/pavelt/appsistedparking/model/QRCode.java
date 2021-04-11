@@ -62,11 +62,6 @@ public class QRCode {
         // fetch the code from the database
         String query = "SELECT code FROM appsisted.parkingsite WHERE location=? AND site=?";
 
-        System.out.println(site);
-        System.out.println(site);
-        System.out.println(site);
-        System.out.println(site);
-
         // bind the location and site to the query
         PreparedStatement ps = CassandraClient.getClient().prepare(query);
         BoundStatement bs = ps.bind(location, site);

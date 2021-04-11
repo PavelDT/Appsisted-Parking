@@ -24,11 +24,17 @@ public class ParkingSite {
     public static String getLocationInfo(String location, String site, String username) {
         // Using "json" infront of the column specification allows cassandra to
         // return the result as a json formatted object.
-        String query = "SELECT json location, site, available, capacity, lat, lon " +
+        String query = "SELECT json location, site, available, capacity, lat, lon, price " +
                        "FROM appsisted.parkingsite WHERE location=?";
-
         PreparedStatement ps = CassandraClient.getClient().prepare(query);
-        BoundStatement bs = ps.bind(location.toLowerCase());
+        BoundStatement bs;
+        // safeguard against users that haven't configured preferences
+        // default to stirling as the recommendation site.
+        if (location.equals("none")) {
+            bs = ps.bind("stirling");
+        } else {
+            bs = ps.bind(location.toLowerCase());
+        }
 
         // fetch all parking sites for that location
         ResultSet rs = CassandraClient.getClient().execute(bs);
@@ -134,7 +140,6 @@ public class ParkingSite {
                 recommendedSite = dq.getFirst().getString("site");
                 mostSpotsAvailable = dq.getFirst().getInt("available");
             }
-
         } else {
             // no specific user preference
             // recommend the most empty parking lot.
@@ -150,7 +155,7 @@ public class ParkingSite {
         }
 
         // replace first character which denotes the start of the array, aka "["
-        // and put in the "[" again, the recomendation object and a comma
+        // and put in the "[" again, the recommendation object and a comma
         // the effect of this is that the recommendation is appended at the start
         String jsonStr = json.toString();
         // format: {"recommended":"ONE","available-spots":100}

@@ -12,7 +12,7 @@ public class ParkingSiteTest {
      */
     @Test
     public void testExpectedDefaults() {
-        ParkingSite ps = new ParkingSite("stirling", "Willow Court", 10, 10, 0.0f, 0.0f);
+        ParkingSite ps = new ParkingSite("stirling", "Willow Court", 10, 10, 0.0f, 0.0f, 1f);
 
         assertEquals(ps.getAvailable(), 10);
         assertSame(ps.getSite(), "Willow Court");

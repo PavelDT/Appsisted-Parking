@@ -90,7 +90,7 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
             // something went wrong
             throw new RuntimeException("Failed to load user details");
         } else {
-            initUser(b.getString("username"), b.getString("location"), b.getString("site"));
+            initUser(b.getString("username"), b.getString("location"), b.getString("site"), b.getFloat("balance"));
         }
 
         // initialize text to speech
@@ -114,6 +114,9 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
 
         // initialize update settings button
         initUpdateSettingsButton();
+
+        // set the user's initial balance
+        updateUserBalance(0);
     }
 
     /**
@@ -225,12 +228,13 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
      * @param username - username of user
      * @param location - preferred parking location of user
      * @param site - preferred site of parking of user
+     * @param balance - user's balance
      */
-    private void initUser(String username, String location, String site) {
+    private void initUser(String username, String location, String site, float balance) {
         if (location.equals("none")) {
             user = new User(username);
         } else {
-            user = new User(username, location, site);
+            user = new User(username, location, site, balance);
         }
     }
 
@@ -306,7 +310,7 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
             String qrCodeData = ir.getContents();
             Log.i("QRCode ", "successfully read qr code: " + qrCodeData);
             // change state of parking
-            parkingFragment.park(qrCodeData);
+            parkingFragment.park(qrCodeData, user.getUsername());
         } else {
              Toast.makeText(this, "Error processing QRCode", Toast.LENGTH_LONG).show();
         }
@@ -504,5 +508,24 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
 
         // Add the request to the RequestQueue.
         queue.add(stringRequest);
+    }
+
+    /**
+     * Update the user's balance
+     * @param change - the change to be subtracted from the user's balance. To add to the balance
+     *                 provide a negative number.
+     */
+    protected void updateUserBalance(float change) {
+        float balance = user.getBalance() - change;
+        user.setBalance(balance);
+
+        // in order to access the drawer panel, the parent menu needs to be referenced
+        // access the NavigationView that stores the panel
+        final NavigationView parentView = findViewById(R.id.navViewDrawer);
+        // update the
+        TextView balanceText = parentView.getHeaderView(0).findViewById(R.id.balanceLabel);
+        // double doesn't have to string, so this was used instead
+        balanceText.setText("£ " + String.valueOf(balance));
+
     }
 }

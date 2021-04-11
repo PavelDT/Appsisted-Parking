@@ -19,13 +19,15 @@ public class User {
     private String salt;
     private String settingLocation;
     private String settingSite;
+    private float balance;
 
-    public User (String username, String password, String salt, String settingLocation, String settingSite) {
+    public User (String username, String password, String salt, String settingLocation, String settingSite, float balance) {
         this.username = username;
         this.password = password;
         this.salt = salt;
         this.settingLocation = settingLocation;
         this.settingSite = settingSite;
+        this.balance = balance;
     }
 
     /**
@@ -68,6 +70,14 @@ public class User {
         return settingSite;
     }
 
+    /**
+     * Gets the balance of the user
+     * @return - float representing user's balance in GBP
+     */
+    public float getBalance() {
+        return balance;
+    }
+
     // Below is the database access layer
 
     /**
@@ -97,8 +107,9 @@ public class User {
             String salt = all.get(0).getString("salt");
             String location = all.get(0).getString("setting_location");
             String site = all.get(0).getString("setting_site");
+            float balance = all.get(0).getFloat("balance");
 
-            return new User(uname, passw, salt, location, site);
+            return new User(uname, passw, salt, location, site, balance);
         }
 
         // no such user exists, or multiple users with same username
@@ -124,8 +135,8 @@ public class User {
         }
 
         CassandraClient client = CassandraClient.getClient();
-        String query = "INSERT INTO appsisted.user (username, password, salt, setting_location, setting_site) " +
-                       "VALUES (?, ?, ?, 'none', 'none');";
+        String query = "INSERT INTO appsisted.user (username, password, salt, setting_location, setting_site, balance) " +
+                       "VALUES (?, ?, ?, 'none', 'none', 0);";
 
         String salt = PasswordManager.getInstance().generateSalt();
         String hash = PasswordManager.getInstance().hashPassword(salt, password);
@@ -150,7 +161,7 @@ public class User {
 
     /**
      * Checks if a user exists
-     * @param username
+     * @param username of the user
      * @return boolean - whether user exists or not
      */
     public static boolean userExists(String username) {
@@ -187,5 +198,33 @@ public class User {
 
         // no exception, update succeeded
         return true;
+    }
+
+    /**
+     * Update the user's balance without relying on external params relating to cost of the update
+     * @param username - username of user to update
+     * @param location - location bing parked on
+     * @param site - site being parked on
+     */
+    public static void chargeUserForParking(String username, String location, String site) {
+
+        String queryPrice = "SELECT price FROM appsisted.parkingsite WHERE location=? AND site=?";
+        PreparedStatement ps = CassandraClient.getClient().prepare(queryPrice);
+        BoundStatement bs = ps.bind(location, site);
+        // there should be only one result for this query
+        Row r = CassandraClient.getClient().execute(bs).one();
+        float price = r.getFloat("price");
+
+        String queryBalance = "SELECT balance FROM appsisted.user WHERE username=?";
+        PreparedStatement ps2 = CassandraClient.getClient().prepare(queryBalance);
+        BoundStatement bs2 = ps2.bind(username);
+        r = CassandraClient.getClient().execute(bs2).one();
+        float balance = r.getFloat("balance") - price;
+
+        // update the user's balance
+        String queryUpdate = "UPDATE appsisted.user SET balance=? WHERE username=?";
+        PreparedStatement ps3 = CassandraClient.getClient().prepare(queryUpdate);
+        BoundStatement bs3 = ps3.bind(balance, username);
+        CassandraClient.getClient().execute(bs3);
     }
 }

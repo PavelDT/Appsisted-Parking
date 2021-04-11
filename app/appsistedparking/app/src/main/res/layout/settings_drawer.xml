@@ -14,13 +14,31 @@
         android:text="Appsisted Parking" />
 
     <TextView
+        android:id="@+id/balanceLabelTitle"
+        android:layout_marginTop="24dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="30sp"
+        android:text="Balance"
+        android:layout_below="@+id/appName"/>
+
+    <TextView
+        android:id="@+id/balanceLabel"
+        android:layout_marginTop="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:text="£0"
+        android:layout_below="@+id/balanceLabelTitle"/>
+
+    <TextView
         android:id="@+id/settingsLabelTitle"
         android:layout_marginTop="24dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="30sp"
         android:text="Settings"
-        android:layout_below="@+id/appName"/>
+        android:layout_below="@+id/balanceLabel"/>
 
     <TextView
         android:id="@+id/settingsLabelLocation"

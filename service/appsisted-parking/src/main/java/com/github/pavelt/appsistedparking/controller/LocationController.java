@@ -12,8 +12,6 @@ public class LocationController {
     @RequestMapping(value = "/location/status", method = RequestMethod.GET)
     @ResponseBody
     public String getStatus(@RequestParam String location, @RequestParam String site, @RequestParam String username){
-
-        // todo -- maybe update user state from not_parked to PARKING
         return ParkingSite.getLocationInfo(Sanitizer.sanitizeAll(location), Sanitizer.sanitizeAll(site), Sanitizer.sanitizeAll(username));
     }
 

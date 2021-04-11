@@ -40,9 +40,10 @@ public class ParkingLocation {
                 int capacity = parkingSite.getInt("capacity");
                 float lon = (float)parkingSite.getDouble("lon");
                 float lat = (float)parkingSite.getDouble("lat");
+                float price = (float)parkingSite.getDouble("price");
 
                 // populate the parking site list
-                ParkingSite parkingLotSite = new ParkingSite(location, site, available, capacity, lon, lat);
+                ParkingSite parkingLotSite = new ParkingSite(location, site, available, capacity, lon, lat, price);
                 parkingSites.add(parkingLotSite);
             }
 

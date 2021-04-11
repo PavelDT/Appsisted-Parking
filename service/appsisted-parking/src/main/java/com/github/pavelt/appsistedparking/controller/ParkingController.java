@@ -2,6 +2,7 @@ package com.github.pavelt.appsistedparking.controller;
 
 import com.github.pavelt.appsistedparking.model.ParkingSite;
 import com.github.pavelt.appsistedparking.model.QRCode;
+import com.github.pavelt.appsistedparking.model.User;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.BufferedImageHttpMessageConverter;
@@ -13,9 +14,9 @@ import java.awt.image.BufferedImage;
 @RestController
 public class ParkingController {
 
-    @RequestMapping(value = "/parking/park", method = RequestMethod.GET)
+    @RequestMapping(value = "/parking/park", method = RequestMethod.POST)
     @ResponseBody
-    public String park(@RequestParam String qrCode) {
+    public String park(@RequestParam String qrCode, @RequestParam String username) {
 
         String data[] = qrCode.split("\\+");
         String location = data[0];
@@ -29,6 +30,9 @@ public class ParkingController {
             ParkingSite.modifyAvailable(location, parkingSite, false);
             // rotate the parking code
             QRCode.rotateCode(location, parkingSite);
+
+            // now charge the user for parking
+            User.chargeUserForParking(username, location, parkingSite);
 
             return "true";
         }

@@ -40,7 +40,7 @@ public class Schema {
                 .append(keyspace)
                 .append(".")
                 .append(table)
-                .append(" (username text, password text, salt text, setting_location text, setting_site text, PRIMARY KEY(username))");
+                .append(" (username text, password text, salt text, setting_location text, setting_site text, balance float, PRIMARY KEY(username))");
 
         CassandraClient session = CassandraClient.getClient();
         session.execute(keyspaceQuery.toString());
@@ -69,7 +69,7 @@ public class Schema {
                 .append(keyspace)
                 .append(".")
                 .append(table)
-                .append(" (location text, site text, capacity int, available int, lat float, lon float, code text, ")
+                .append(" (location text, site text, capacity int, available int, lat float, lon float, price float, code text, ")
                 .append("PRIMARY KEY(location, site))");
 
         CassandraClient session = CassandraClient.getClient();
@@ -93,24 +93,24 @@ public class Schema {
 
         String code1 = "stirling+Willow Court+14129a27-c38e-4f0b-a40b-220e944062d3";
         String site2 = "INSERT INTO " + keyspace + "." + table +
-                " (location, site, capacity, available, lat, lon, code) " +
-                " VALUES ('stirling', 'Willow Court', 200, 200, 56.149451, -3.922113, '" + code1 + "')";
+                " (location, site, capacity, available, lat, lon, price, code) " +
+                " VALUES ('stirling', 'Willow Court', 200, 200, 56.149451, -3.922113, 1.00, '" + code1 + "')";
 
 
         String code2 = "stirling+Cottrell+" + UUID.randomUUID().toString();
         String site1 = "INSERT INTO " + keyspace + "." + table +
-                " (location, site, capacity, available, lat, lon, code) " +
-                " VALUES ('stirling', 'Cottrell', 130, 130, 56.143046, -3.919445, '" + code2 + "')";
+                " (location, site, capacity, available, lat, lon, price, code) " +
+                " VALUES ('stirling', 'Cottrell', 130, 130, 56.143046, -3.919445, 1.00, '" + code2 + "')";
 
         String code3 = "stirling+Pathfoot+" + UUID.randomUUID().toString();
         String site3 = "INSERT INTO " + keyspace + "." + table +
-                " (location, site, capacity, available, lat, lon, code) " +
-                " VALUES ('stirling', 'Pathfoot', 150, 150, 56.148576, -3.928216, '" + code3 + "')";
+                " (location, site, capacity, available, lat, lon, price, code) " +
+                " VALUES ('stirling', 'Pathfoot', 150, 150, 56.148576, -3.928216, 1.00, '" + code3 + "')";
 
         String code4 = "stirling+South+" + UUID.randomUUID().toString();
         String site4 = "INSERT INTO " + keyspace + "." + table +
-                " (location, site, capacity, available, lat, lon, code) " +
-                " VALUES ('stirling', 'South', 185, 185, 56.142379, -3.922227, '" + code4 + "')";
+                " (location, site, capacity, available, lat, lon, price, code) " +
+                " VALUES ('stirling', 'South', 185, 185, 56.142379, -3.922227, 1.00, '" + code4 + "')";
 
         CassandraClient session = CassandraClient.getClient();
         session.execute(site1);

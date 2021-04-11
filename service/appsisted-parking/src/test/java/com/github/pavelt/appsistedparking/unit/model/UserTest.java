@@ -15,7 +15,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringRunner.class)
 public class UserTest {
 
-    private final User user = new User("jack", "pa$$W0rD", "salt", "stirling", "Cottrell");
+    private final User user = new User("jack", "pa$$W0rD", "salt", "stirling", "Cottrell", 0f);
 
     /**
      * Tests all getters validate and encrypt details as expected.

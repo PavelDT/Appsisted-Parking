@@ -9,6 +9,7 @@ public class User {
     // default is 'none'
     private String preferredLocation = "none";
     private String preferredSite = "none";
+    private float balance = 0f;
 
     /**
      * Constructor for when the user hasn't set any settings yet.
@@ -24,10 +25,11 @@ public class User {
      * @param preferredLocation - preferred parking location
      * @param preferredSite - preferred parking site
      */
-    public User(String username, String preferredLocation, String preferredSite) {
+    public User(String username, String preferredLocation, String preferredSite, float balance) {
         this.username = username;
         this.preferredLocation = preferredLocation;
         this.preferredSite = preferredSite;
+        this.balance = balance;
     }
 
 
@@ -53,6 +55,22 @@ public class User {
      */
     public String getPreferredSite() {
         return preferredSite;
+    }
+
+    /**
+     * Gets balance of user
+     * @return - balance of user
+     */
+    public float getBalance() {
+        return balance;
+    }
+
+    /**
+     * Update user's balance
+     * @param balance - new balance to update to
+     */
+    public void setBalance(Float balance) {
+        this.balance = balance;
     }
 
     /**
