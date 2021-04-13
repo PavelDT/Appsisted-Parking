@@ -1,9 +1,7 @@
 package com.github.pavelt.appsistedparking.integration.controller;
 
 import com.github.pavelt.appsistedparking.database.CassandraClient;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.*;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -56,8 +54,15 @@ public class ParkingControllerTest {
     private static void parkTest() throws IOException {
         String qrCode = "TEST_X+TEST_Y+TEST_CODE";
         OkHttpClient client = new OkHttpClient();
+
+        RequestBody rb = new FormBody.Builder()
+                .add("qrCode", qrCode)
+                .add("username", "test")
+                .build();
+
         Request request = new Request.Builder()
-                .url("http://localhost:8080/parking/park?qrCode=" + URLEncoder.encode(qrCode))
+                .url("http://localhost:8080/parking/park/")
+                .post(rb)
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
