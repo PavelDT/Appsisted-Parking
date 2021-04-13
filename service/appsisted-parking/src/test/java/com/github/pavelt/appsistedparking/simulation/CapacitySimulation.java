@@ -15,8 +15,14 @@ import static org.junit.Assert.assertTrue;
 
 public class CapacitySimulation {
 
+    // client used for web requests.
     private static OkHttpClient client = new OkHttpClient();
 
+    /**
+     * Simulates 655 people parking at the four available sites at the university
+     * @param args - args.
+     * @throws Exception
+     */
     public static void main(String[] args) throws Exception {
         // make all parking spots available
         setUpParkingLocation();
@@ -55,9 +61,16 @@ public class CapacitySimulation {
         // terminate cassandra's client threads so the simulation can stop running
         CassandraClient.getClient().shutDownClient();
 
+        // output the CVS 
         System.out.println(dataSet);
     }
 
+    /**
+     * parks one user reducing total parking capacity by 1.
+     * @param site - site to park in
+     * @param username - username of person parking
+     * @throws Exception
+     */
     private static void fillParkingLot(String site, String username) throws Exception {
         // get parking recommendation
         String recommendedSite = getParkingRecommendation(site);
@@ -84,6 +97,12 @@ public class CapacitySimulation {
         }
     }
 
+    /**
+     * Gets a parking recommendation based on user preferences
+     * @param site - prefferd site to park on
+     * @return returns string representing the recommended parking site
+     * @throws Exception
+     */
     private static String getParkingRecommendation(String site) throws Exception {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
@@ -101,6 +120,10 @@ public class CapacitySimulation {
         }
     }
 
+    /**
+     * Configures the parking location to be as if there are 0 spots taken up
+     * @throws Exception
+     */
     private static void setUpParkingLocation() throws Exception {
         // drop the table that stores details about the parking location
         String cql = "DROP TABLE IF EXISTS appsisted.parkingsite";
@@ -114,6 +137,12 @@ public class CapacitySimulation {
         Thread.sleep(3000);
     }
 
+    /**
+     * registers a user with parking preferences
+     * @param username - username of user
+     * @param site - site preference for the user
+     * @throws IOException
+     */
     private static void registerUser(String username, String site) throws IOException {
         // creates a web request to the endpoint
         Request request = new Request.Builder()
@@ -142,7 +171,11 @@ public class CapacitySimulation {
             assertTrue(response.code() == 200);
         }
     }
-    
+
+    /**
+     * Collects csv-style information about stats of different parking lots
+     * @return csv formatted string
+     */
     private static String collectMetrics() {
         String cql = "SELECT site, available FROM appsisted.parkingsite";
         ResultSet rs = CassandraClient.getClient().execute(cql);
