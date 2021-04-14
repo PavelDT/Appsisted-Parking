@@ -85,7 +85,6 @@ public class Schema {
 
     /**
      * Populates pre-selected parking locations and their sites.
-     * @return
      */
     private void populateParkingSite() {
         String keyspace = "appsisted";
