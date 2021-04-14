@@ -61,7 +61,8 @@ public class CapacitySimulation {
         // terminate cassandra's client threads so the simulation can stop running
         CassandraClient.getClient().shutDownClient();
 
-        // output the CVS 
+        // output the CVS
+        System.out.println("Cottrell,Pathfoot,South,Willow Court");
         System.out.println(dataSet);
     }
 
@@ -184,8 +185,8 @@ public class CapacitySimulation {
             String site = r.getString("site");
             int available = r.getInt("available");
 
-            data += site + " " + available + ",";
+            data += available + ",";
         }
-        return data;
+        return data.substring(0, data.length()-1);
     }
 }

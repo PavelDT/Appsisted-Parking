@@ -8,6 +8,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class UserController {
 
+    /**
+     * /user/regiester endpoint - allows a user to register for appsisted-parking
+     * @param username - username of user
+     * @param password - user's password
+     * @return String representing message of success or failure to register
+     */
     @RequestMapping(value = "/user/register", method = RequestMethod.GET)
     @ResponseBody
     public String userRegister(@RequestParam String username, @RequestParam String password){
@@ -19,6 +25,12 @@ public class UserController {
         return User.register(sanitizedUsername, sanitizedPassword);
     }
 
+    /**
+     * /user/login endpoint - allows user to login to the system
+     * @param username - username of user
+     * @param password - password of user
+     * @return - User object as JSON
+     */
     @RequestMapping(value = "/user/login", produces = ("application/json"), method = RequestMethod.GET)
     @ResponseBody
     public User userLogin(@RequestParam String username, @RequestParam String password){
@@ -43,12 +55,22 @@ public class UserController {
         }
     }
 
+    /**
+     * Enables user to logout
+     * @param username - username of user to logout.
+     * @return - String
+     */
     @RequestMapping(value = "/user/logout", method = RequestMethod.GET)
     @ResponseBody
     public String userLogout(@RequestParam String username){
         return "logout";
     }
 
+    /**
+     * /user/exists endpoint - Checks if a user exists
+     * @param username - username of user
+     * @return String representing if a user exists or not.
+     */
     @RequestMapping(value = "/user/exists", method = RequestMethod.GET)
     @ResponseBody
     public String userExists(@RequestParam String username){
@@ -59,6 +81,13 @@ public class UserController {
         return "false - " + username;
     }
 
+    /**
+     * /user/settings/update endpoint - enables user to update their parking preferences
+     * @param username - username of user
+     * @param location - location to be set as preffered
+     * @param site - site to be set as preffered.
+     * @return - String representing success or failure.
+     */
     @RequestMapping(value = "/user/settings/update", method = RequestMethod.PUT)
     @ResponseBody
     public String updateSettings(@RequestParam String username, @RequestParam String location, @RequestParam String site) {

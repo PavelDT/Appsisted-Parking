@@ -4,12 +4,12 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.BoundStatement;
 import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
-import com.datastax.oss.driver.api.core.metadata.Node;
 
 import java.net.InetSocketAddress;
-import java.util.Map;
-import java.util.UUID;
 
+/**
+ * Class enforced as a singleton. This is to allow the cassandra client to maintain its own connection-pool.
+ */
 public class CassandraClient {
 
     private static CassandraClient instance;

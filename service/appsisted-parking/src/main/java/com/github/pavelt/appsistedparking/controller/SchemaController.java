@@ -11,6 +11,10 @@ import java.util.List;
 @RestController
 public class SchemaController {
 
+    /**
+     * /schema/createall endpoint creates all the schema needed by Cassandra.
+     * @return
+     */
     @RequestMapping(value = "/schema/createall", method = RequestMethod.GET)
     @ResponseBody
     public String createAll(){

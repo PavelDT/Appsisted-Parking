@@ -7,9 +7,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class RootController {
 
+    /**
+     * Root controler of the app.
+     * @return
+     */
     @RequestMapping("/")
     @ResponseBody
     public String root(){
-        return "You've accessed the root. Why?";
+        return "Welcome to Appsisted-parking!\nNothing to see here.";
     }
 }
