@@ -26,7 +26,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.github.paveldt.appsistedparking.R;
 import com.github.paveldt.appsistedparking.util.Animation;
 import com.github.paveldt.appsistedparking.util.JSONUtil;
@@ -129,6 +128,7 @@ public class LoginActivity extends AppCompatActivity {
                                         Intent parkingIntent = new Intent(LoginActivity.this, ParkingActivity.class);
                                         // pass param for user to parking activity
                                         parkingIntent.putExtra("username", username.getText().toString().trim());
+                                        parkingIntent.putExtra("balance", user.getDouble("balance") + "");
                                         // update preference settings
                                         parkingIntent.putExtra("location", user.getString("settingLocation"));
                                         parkingIntent.putExtra("site", user.getString("settingSite"));

@@ -10,15 +10,20 @@ import java.util.List;
 // this class contains a ton of boilerplate code
 public class ParkingLocation {
 
-    List<ParkingSite> parkingSites;
-    String recommendedLocation;
-    int availableSpots;
+    private List<ParkingSite> parkingSites;
+    private String recommendedLocation;
+    private int availableSpots;
 
     public ParkingLocation(String jsonLocationInfo) {
         parkingSites = new ArrayList();
         parseLocationInfo(jsonLocationInfo);
     }
 
+    /**
+     * Parses location info by processing the json string passed in and processing the JSON into a
+     * list of ParkingSite objects.
+     * @param json
+     */
     private void parseLocationInfo(String json) {
         // verify that the result was turned into json correctly
         try {
@@ -53,14 +58,26 @@ public class ParkingLocation {
         }
     }
 
+    /**
+     * Gets the recommended site
+     * @return - String representing the recommended site
+     */
     public String getRecommendedLocation() {
         return recommendedLocation;
     }
 
+    /**
+     * Gets the number of available spots
+     * @return int representing number of available spots.
+     */
     public int getAvailableSpots() {
         return availableSpots;
     }
 
+    /**
+     * Returns all th eparking site info that was processed from the json earlier.
+     * @return - List of ParkingSite objects.
+     */
     public List<ParkingSite> getParkingSites() {
         return parkingSites;
     }

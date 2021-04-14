@@ -90,7 +90,7 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
             // something went wrong
             throw new RuntimeException("Failed to load user details");
         } else {
-            initUser(b.getString("username"), b.getString("location"), b.getString("site"), b.getFloat("balance"));
+            initUser(b.getString("username"), b.getString("location"), b.getString("site"), b.getString("balance"));
         }
 
         // initialize text to speech
@@ -116,6 +116,8 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
         initUpdateSettingsButton();
 
         // set the user's initial balance
+        // 0 means we do user balance - 0
+        // thus 0 is actually correct here.
         updateUserBalance(0);
     }
 
@@ -130,10 +132,10 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
             mapFragment.setUserLocation(location);
             mapFragment.updateMapView();
 
-            // todo - current implementation relies on a location change
-            //        to update the remaining distance.
-            //        This is due to the map having to load first befure such
-            //        a calculation can occur. Not a problem, but not ideal.
+            // current implementation relies on a location change
+            // to update the remaining distance.
+            // This is due to the map having to load first befure such
+            // a calculation can occur. Not a problem, but not ideal.
             updateDistanceRemainingTxt();
         }
     }
@@ -230,11 +232,12 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
      * @param site - preferred site of parking of user
      * @param balance - user's balance
      */
-    private void initUser(String username, String location, String site, float balance) {
+    private void initUser(String username, String location, String site, String balance) {
         if (location.equals("none")) {
             user = new User(username);
+            user.setBalance(Float.parseFloat(balance));
         } else {
-            user = new User(username, location, site, balance);
+            user = new User(username, location, site, Float.parseFloat(balance));
         }
     }
 
@@ -291,14 +294,24 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
         }
     }
 
+    /**
+     * Initialises the parking fragment used when the user is heading towards a parking site
+     */
     private void initParkingFragment() {
         parkingFragment = new ParkingFragment();
     }
 
+    /**
+     * Initialises the parked frament used when the user has parked inside of a parking site
+     */
     private void initParkedFragment() {
         parkedFragment = new ParkedFragment();
     }
 
+    /**
+     * Necessary for processing the result of the QRCaptureActivity - aka the result of scanning
+     * for a QR code via the camera.
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -377,6 +390,10 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
         queue.add(stringRequest);
     }
 
+    /**
+     * Switches frames - switches out the "parking" frame and replaces it with a "parked" frame.
+     * @param parkingCode - the scanned QRCode
+     */
     public void parkFragmentSwitch(String parkingCode) {
         // use QR code for site and location
         String[] data = parkingCode.split("\\+");
@@ -387,6 +404,10 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentFrame, parkedFragment).commitAllowingStateLoss();
     }
 
+    /**
+     * Switches the parked fragment out and replaces it with the map fragment - signifies user
+     * exiting the parking site.
+     */
     public void exitParkingLotFragmentSwitch() {
         // switch from parked fragment to map fragment
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentFrame, mapFragment).commitAllowingStateLoss();
@@ -410,6 +431,9 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
         });
     }
 
+    /**
+     * Initialises hiddend drawer side-pannel
+     */
     private void initToggleDrawer() {
         DrawerLayout drawerLayout = findViewById(R.id.parkingLayoutDrawer);
         toggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close);
@@ -526,6 +550,5 @@ public class ParkingActivity extends AppCompatActivity implements LocationListen
         TextView balanceText = parentView.getHeaderView(0).findViewById(R.id.balanceLabel);
         // double doesn't have to string, so this was used instead
         balanceText.setText("£ " + String.valueOf(balance));
-
     }
 }

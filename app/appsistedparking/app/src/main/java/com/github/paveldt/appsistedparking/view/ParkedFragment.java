@@ -1,14 +1,10 @@
 package com.github.paveldt.appsistedparking.view;
 
-import android.app.NotificationManager;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 
-import android.speech.tts.TextToSpeech;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,15 +17,19 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.github.paveldt.appsistedparking.R;
-import com.github.paveldt.appsistedparking.model.ParkingLocation;
 import com.github.paveldt.appsistedparking.model.ParkingState;
 import com.github.paveldt.appsistedparking.util.WebRequestQueue;
 
+import java.net.URLEncoder;
+
 public class ParkedFragment extends Fragment {
 
-    String location;
-    String site;
+    private String location;
+    private String site;
 
+    /**
+     * Required default constructor.
+     */
     public ParkedFragment() {
     }
 
@@ -50,14 +50,26 @@ public class ParkedFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Sets the site which the user parked in
+     * @param location - new site
+     */
     public void setLocation(String location) {
         this.location = location;
     }
 
+    /**
+     * Sets the site that the user has parked in
+     * @param site - new site
+     */
     public void setSite(String site) {
         this.site = site;
     }
 
+    /**
+     * Initialises the "exit parkingsite" button. Enables user to leave a parking site
+     * @param view
+     */
     private void initExitButton(View view) {
         Button exitButton = view.findViewById(R.id.exitButton);
         exitButton.setOnClickListener(new View.OnClickListener() {
@@ -66,7 +78,8 @@ public class ParkedFragment extends Fragment {
 
                 final Context context = getContext();
                 RequestQueue queue = WebRequestQueue.getInstance(context);
-                String url = "http://10.0.2.2:8080/parking/exit?location=" + location + "&site=" + site;
+                String url = "http://10.0.2.2:8080/parking/exit?location=" + URLEncoder.encode(location) +
+                        "&site=" + URLEncoder.encode(site);
 
                 StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
                     @Override
@@ -80,7 +93,7 @@ public class ParkedFragment extends Fragment {
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(context, "<--ERROR--> " + error.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, "Error exiting parking site:" + error.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
 

@@ -37,8 +37,6 @@ public class MapFragment extends Fragment {
         // initialize view
         View view = inflater.inflate(R.layout.fragment_map, container, false);
 
-        Log.i("???????", (getActivity() == null) + "");
-
         // initialize map fragment
         final SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.googleMap);
         // use an asynchronous map
@@ -155,6 +153,10 @@ public class MapFragment extends Fragment {
         return results[0] / 1000;
     }
 
+    /**
+     * Sets the user's location
+     * @param locUpdate - new location
+     */
     public void setUserLocation(Location locUpdate) {
         userLocation = locUpdate;
     }

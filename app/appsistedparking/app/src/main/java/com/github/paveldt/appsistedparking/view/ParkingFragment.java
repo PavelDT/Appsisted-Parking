@@ -34,6 +34,9 @@ public class ParkingFragment extends Fragment {
 
     private ParkingLocation parkingInfo;
 
+    /**
+     * Required empty constructor.
+     */
     public ParkingFragment() {
     }
 
@@ -64,11 +67,18 @@ public class ParkingFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Updates parking info - used by parent activity.
+     * @param parkingInfo - new parking info
+     */
     public void setParkingInfo(ParkingLocation parkingInfo) {
         this.parkingInfo = parkingInfo;
-        // Required empty public constructor
     }
 
+    /**
+     * Ppopulates the table storing information about all other parking sites.
+     * @param table - Table control to populate.
+     */
     private void populateOtherLocationsTable(TableLayout table) {
 
         // create a header
@@ -113,6 +123,10 @@ public class ParkingFragment extends Fragment {
         }
     }
 
+    /**
+     * Initialises Scan for QR Code button.
+     * @param view - Parent view of the button.
+     */
     private void initQRScanButton(View view) {
         Button qrScanButton = view.findViewById(R.id.qrScanButton);
 
@@ -157,9 +171,12 @@ public class ParkingFragment extends Fragment {
                     ParkingState.getInstance().setParkingState(ParkingState.PARKED);
 
                     // find the correct price of the site that the user is being parking in
-                    float price = 0.5f;
+                    float price = 1.0f;
                     for (ParkingSite s : parkingInfo.getParkingSites()) {
-                        if (parkingInfo.getRecommendedLocation().equals(s.getSite())) {
+                        // component 1 = site
+                        String parkedAtSite = parkingCode.split("\\+")[1];
+                        if (s.getSite().equals(parkedAtSite)) {
+                            Log.i("MATCHED", " " + s);
                             price = s.getPrice();
                         }
                     }

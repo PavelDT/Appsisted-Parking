@@ -22,7 +22,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.github.paveldt.appsistedparking.R;
 import com.github.paveldt.appsistedparking.util.WebRequestQueue;
 
@@ -43,6 +42,9 @@ public class RegistrationActivity extends AppCompatActivity {
         initRegisterButton();
     }
 
+    /**
+     * Initialises the registration button
+     */
     private void initRegisterButton() {
         Button registerButton = findViewById(R.id.buttonRegister);
         registerButton.setOnClickListener(new View.OnClickListener() {
